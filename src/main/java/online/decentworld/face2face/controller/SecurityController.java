@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.service.security.advice.IAdviceService;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.report.IReportService;
 import online.decentworld.rdb.entity.CustomAdvice.AdviceType;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -28,7 +29,8 @@ public class SecurityController {
 	private IReportService reportService;
 	@Autowired
 	private IAdviceService adviceService;
-	
+	@Autowired
+	private IUserAuthorityService authorityService;
 	
 	@RequestMapping("/report")
 	@ResponseBody
@@ -49,7 +51,7 @@ public class SecurityController {
 	@ResponseBody
 	@Frequency(limit=1,time=60000)
 	public ResultBean advise(MultipartFile voice,HttpServletRequest request) throws IOException{
-		ResultBean bean=null;
+		ResultBean bean;
 		String dwID=request.getParameter("dwID");
 		String type=request.getParameter("type");
 		if(dwID!=null&&type!=null&&AdviceType.valueOf(type.toUpperCase())!=null){
@@ -62,4 +64,19 @@ public class SecurityController {
 		}
 		return bean;
 	}
+
+	@RequestMapping(value="/key/get")
+	@ResponseBody
+	public ResultBean getRSAKey(@RequestParam String dwID) throws IOException{
+		return authorityService.getRSAKey();
+	}
+
+
+	@RequestMapping(value="/key/upload")
+	@ResponseBody
+	public ResultBean uploadAES(@RequestParam String dwID,@RequestParam String key) throws IOException{
+		return authorityService.getRSAKey();
+	}
+
+
 }

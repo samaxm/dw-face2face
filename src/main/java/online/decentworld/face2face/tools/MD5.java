@@ -83,7 +83,19 @@ public class MD5 {
             return null;
         }
     }
-    
+
+    public static String GetMD5Code(byte[] data) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // md.digest() 该函数返回值为存放哈希值结果的byte数组
+            return byteToString(md.digest(data));
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println("MD5加密错误");
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
 //    public static String getSaltedMD5Code(String str){
 //    		return GetMD5Code(str+getSalt());
 //    }

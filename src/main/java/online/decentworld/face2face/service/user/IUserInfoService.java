@@ -10,14 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface IUserInfoService {
 	public ResultBean bindUserPhoneNum(String dwID,String phoneNum,String code);
-	
+
 	public ObjectResultBean getUserInfo(String dwID);
 	
 	public ResultBean updateUserInfo(User user);
 	
 	public ResultBean setPassword(String dwID,String password,String token);
-	@Transactional
-	public ResultBean likeUser(String dwID,String likedID);
-	
-	public ListResultBean<LikeRecord> getLikeRecords(String dwID); 
+
 }

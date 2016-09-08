@@ -38,8 +38,7 @@ public class UserInfoService implements IUserInfoService{
 	private UserMapper userMapper;
 	@Autowired
 	private ITokenCheckService tokenService;
-	@Autowired
-	private LikeRecordMapper likeMapper;
+
 	@Autowired
 	private WealthMapper wealthMapper;
 	
@@ -128,26 +127,7 @@ public class UserInfoService implements IUserInfoService{
 
 
 
-	@Override
-	public ResultBean likeUser(String dwID, String likedID) {
-		LikeRecord record=new LikeRecord(dwID,likedID);
-		try{
-			likeMapper.insertSelective(record);
-		}catch(DuplicateKeyException ex){
-		}
-		return ResultBean.SUCCESS;
-	}
 
-
-
-	@Override
-	public ListResultBean<LikeRecord> getLikeRecords(String dwID) {
-		ListResultBean<LikeRecord> list=new ListResultBean<LikeRecord>();
-		List<LikeRecord> records=likeMapper.getLikeRecords(dwID);
-		list.setStatusCode(SUCCESS);
-		list.setData(records);
-		return list;
-	}
 
 
 }

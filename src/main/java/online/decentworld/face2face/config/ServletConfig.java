@@ -57,7 +57,6 @@ public class ServletConfig extends WebMvcConfigurerAdapter{
 	public RequestMappingHandlerAdapter requestMappingHandlerAdapter(){
 		RequestMappingHandlerAdapter handlerAdapter=new RequestMappingHandlerAdapter();
 		handlerAdapter.setAsyncRequestTimeout(20000);
-		
 		List<HttpMessageConverter<?>> list=new LinkedList<HttpMessageConverter<?>>();
 		MappingJackson2HttpMessageConverter converter=new MappingJackson2HttpMessageConverter();
 		list.add(converter);

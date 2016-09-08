@@ -71,13 +71,6 @@
           <element id="library" level="project" name="Maven: org.mortbay.jetty:jetty-util:6.0.0" />
           <element id="library" level="project" name="Maven: org.mortbay.jetty:jsp-api-2.1:6.0.0" />
           <element id="library" level="project" name="Maven: ant:ant:1.6.5" />
-          <element id="library" level="project" name="Maven: org.eclipse.jetty:jetty-server:9.3.0.M0" />
-          <element id="library" level="project" name="Maven: org.eclipse.jetty:jetty-http:9.3.0.M0" />
-          <element id="library" level="project" name="Maven: org.eclipse.jetty:jetty-util:9.3.0.M0" />
-          <element id="library" level="project" name="Maven: org.eclipse.jetty:jetty-io:9.3.0.M0" />
-          <element id="library" level="module" name="activemq-all-5.13.3.jar" module-name="face2face" />
-          <element id="library" level="module" name="fastdfs_client_v1.24.jar" module-name="face2face" />
-          <element id="library" level="module" name="taobao-sdk-java-auto_1455552377940-20160414.jar" module-name="face2face" />
         </element>
       </element>
       <element id="directory" name="META-INF">

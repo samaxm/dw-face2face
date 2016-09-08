@@ -8,13 +8,19 @@ import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
 import online.decentworld.face2face.tools.RandomUtil;
+import online.decentworld.rdb.entity.LikeRecord;
+import online.decentworld.rdb.mapper.LikeRecordMapper;
+import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+
+import java.util.List;
 
 /**
  * 获取匹配用户，通过redis队列实现
@@ -30,7 +36,10 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	private MatchQueueCache matchCache;
 	@Autowired
 	private IReportService reportService;
-	
+	@Autowired
+	private LikeRecordMapper likeMapper;
+
+
 	/**
 	 * 匹配等待队列数量，数量关系到了用户断线后重复遇到的几率以及用户等待的时间，该数值应当和当前在线人数相关，可弹性变化
 	 */
@@ -67,4 +76,27 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		}
 		return bean;
 	}
+
+
+	@Override
+	public ResultBean likeUser(String dwID, String likedID) {
+		LikeRecord record=new LikeRecord(dwID,likedID);
+		try{
+			likeMapper.insertSelective(record);
+		}catch(DuplicateKeyException ex){
+		}
+		return ResultBean.SUCCESS;
+	}
+
+
+
+	@Override
+	public ListResultBean<LikeRecord> getLikeRecords(String dwID) {
+		ListResultBean<LikeRecord> list=new ListResultBean<LikeRecord>();
+		List<LikeRecord> records=likeMapper.getLikeRecords(dwID);
+		list.setStatusCode(SUCCESS);
+		list.setData(records);
+		return list;
+	}
+
 }

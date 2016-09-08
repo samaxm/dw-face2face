@@ -140,6 +140,8 @@ public class ConfigLoader {
 		}
 		public static String ADMIN_PHONE;
 		public static String DEFAULT_MATCH_QUEUE_SIZE;
+		public static String RSA_PUBLIC;
+		public static String RSA_PRIVATE;
 	}
 	
 	public static class DomainConfig{

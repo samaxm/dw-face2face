@@ -92,5 +92,28 @@ public class SecurityCache {
 		});
 		return (String)result.getResult();
 	}
-	
+
+	public void cacheAES(String dwID,String aes) throws Exception {
+		ReturnResult result=template.cache((Jedis jedis)->{
+			jedis=RedisClient.getJedis();
+			jedis.hset(CacheKey.AES,dwID,aes);
+			return ReturnResult.SUCCESS;
+		});
+		if(!result.isSuccess()){
+			throw new Exception();
+		}
+	}
+
+	public String getAES(String dwID){
+		ReturnResult result=template.cache((Jedis jedis)->{
+			jedis=RedisClient.getJedis();
+			String key=jedis.hget(CacheKey.AES,dwID);
+			return ReturnResult.result(key);
+		});
+		if(result.isSuccess()){
+			return (String)result.getResult();
+		}else{
+			return null;
+		}
+	}
 }

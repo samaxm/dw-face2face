@@ -5,11 +5,14 @@ import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.rpc.dto.api.ResultBean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 
 @RequestMapping("/app")
 @Controller
@@ -17,7 +20,7 @@ public class AppController {
 	
 	@Autowired
 	private IAppService appService;
-	
+	private static Logger logger= LoggerFactory.getLogger(AppController.class);
 	
 	@RequestMapping("/check/version")
 	@ResponseBody
@@ -32,4 +35,5 @@ public class AppController {
 		}
 		return bean;
 	}
+
 }
