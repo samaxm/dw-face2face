@@ -2,6 +2,7 @@ package online.decentworld.face2face.tools;
 
 import java.io.IOException;
 
+import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.config.ConfigLoader;
 
 import org.csource.common.NameValuePair;
@@ -126,4 +127,8 @@ public class FastDFSClient implements FileManagerConfig{
 	  public static ServerInfo[] getFetchStorages(String groupName, String remoteFileName) throws IOException {
 	    return trackerClient.getFetchStorages(trackerServer, groupName, remoteFileName);
 	  }
+
+	public static String getFullURL(String url){
+		return CommonProperties.HTTP+ ConfigLoader.DomainConfig.FDFS_DOMAIN+"/"+url;
+	}
 }

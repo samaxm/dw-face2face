@@ -15,12 +15,16 @@ import org.springframework.stereotype.Service;
 public class RegisterStrategyFactory {
 	@Resource(name="wxRegisterService")
 	private IRegisterService wxRegisterService;
-	
+	@Resource(name = "userInfoEasemobRegisterService")
+	private IRegisterService userInfoEasemobRegisterService;
+
 	public IRegisterService getService(String registerType){
 		RegisterType type=RegisterType.valueOf(registerType);
 		if(type==RegisterType.WX){
 			return wxRegisterService;
-		}else{
+		}else if(type==RegisterType.INFO){
+			return userInfoEasemobRegisterService;
+		}else {
 			return null;
 		}
 	}

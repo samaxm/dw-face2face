@@ -44,8 +44,7 @@ public class WXEasemobRegisterService implements IRegisterService{
 	private WealthMapper wealthMapper;
 	
 	
-	private static int MAX_NAME_LENGTH=20;
-	
+
 	
 	private static Logger logger=LoggerFactory.getLogger(WXEasemobRegisterService.class);
 	
@@ -56,7 +55,6 @@ public class WXEasemobRegisterService implements IRegisterService{
 			WXInfo info=wechatAPI.getWXInfo(code);
 			User user=userMapper.selectByUnionid(info.getUnionid());
 			if(user==null){
-				
 				String password=MD5.GetMD5Code(info.getUnionid());
 				String id=IDUtil.getDWID();
 				id=easemobAPI.registerEasemobUser(id,password);
@@ -83,8 +81,8 @@ public class WXEasemobRegisterService implements IRegisterService{
 	}
 	
 	private User trimName(User info){
-		if(info.getName().length()>MAX_NAME_LENGTH){
-			info.setName(info.getName().substring(info.getName().length()-MAX_NAME_LENGTH,info.getName().length()));
+		if(info.getName().length()>CommonProperties.MAX_NAME_LENGTH){
+			info.setName(info.getName().substring(info.getName().length()-CommonProperties.MAX_NAME_LENGTH,info.getName().length()));
 		}
 		return info;
 	}

@@ -8,6 +8,9 @@ public enum RegisterType {
 	/**
 	 * 微信註冊
 	 */
-	WX;
-	
+	WX,INFO;
+
+	public static void main(String[] args) {
+		System.out.println(RegisterType.valueOf("INFO"));
+	}
 }

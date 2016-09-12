@@ -142,6 +142,7 @@ public class ConfigLoader {
 		public static String DEFAULT_MATCH_QUEUE_SIZE;
 		public static String RSA_PUBLIC;
 		public static String RSA_PRIVATE;
+		public static String NEED_EASEMON;
 	}
 	
 	public static class DomainConfig{

@@ -6,4 +6,6 @@ public final class CommonProperties {
 	final public static String MEDIA_MARKDOWN="text/x-markdown; charset=utf-8";
 	final public static String MEDIA_FORM="multipart/form-data; charset=utf-8";
 	final public static int DEFAULT_WORTH=1;
+	final public static int MAX_NAME_LENGTH=20;
+
 }
