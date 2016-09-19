@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import online.decentworld.face2face.service.security.request.impl.LocalRequestLimit;
-import online.decentworld.face2face.tools.LogUtil;
+import online.decentworld.face2face.tools.WebLogUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class ServletConfig extends WebMvcConfigurerAdapter{
 					Class<? extends HttpMessageConverter<?>> selectedConverterType,
 					ServerHttpRequest request, ServerHttpResponse response) {
 				logger.debug("[CLASS:"+returnType.getContainingClass().getSimpleName().toUpperCase()+" METHOD:"+returnType.getMethod().getName().toUpperCase()+
-						"] PARAMS#"+LogUtil.toLogString(request)+" RETURN#"+JSON.toJSONString(body));
+						"] PARAMS#"+ WebLogUtil.toLogString(request)+" RETURN#"+JSON.toJSONString(body));
 
 				return body;
 			}

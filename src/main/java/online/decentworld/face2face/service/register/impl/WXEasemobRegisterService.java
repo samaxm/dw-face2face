@@ -6,20 +6,15 @@ import online.decentworld.face2face.api.wx.WeChatApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.UserType;
-import online.decentworld.face2face.exception.EasemobRegisterFailed;
-import online.decentworld.face2face.exception.GetEasemobTokenException;
-import online.decentworld.face2face.exception.GetWXAccessTokenError;
-import online.decentworld.face2face.exception.GetWXInfoError;
-import online.decentworld.face2face.exception.RegisterFailException;
+import online.decentworld.face2face.exception.*;
 import online.decentworld.face2face.service.register.IRegisterService;
-import online.decentworld.face2face.tools.IDUtil;
-import online.decentworld.face2face.tools.MD5;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
-
+import online.decentworld.tools.IDUtil;
+import online.decentworld.tools.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +50,8 @@ public class WXEasemobRegisterService implements IRegisterService{
 			WXInfo info=wechatAPI.getWXInfo(code);
 			User user=userMapper.selectByUnionid(info.getUnionid());
 			if(user==null){
-				String password=MD5.GetMD5Code(info.getUnionid());
-				String id=IDUtil.getDWID();
+				String password= MD5.GetMD5Code(info.getUnionid());
+				String id= IDUtil.getDWID();
 				id=easemobAPI.registerEasemobUser(id,password);
 				user=new User(id,info.getUnionid(),info.getOpenid(),info.getHeadimgurl(),info.getNickname(),
 						password,info.getCity(),CommonProperties.DEFAULT_WORTH,null,info.getSex(),null,0,UserType.UNCERTAIN.toString());
@@ -86,8 +81,8 @@ public class WXEasemobRegisterService implements IRegisterService{
 		}
 		return info;
 	}
-	
-	
+
+
 	private void tryStoreUser(User user) throws RegisterFailException{
 		int attemp=0;
 		while(true){

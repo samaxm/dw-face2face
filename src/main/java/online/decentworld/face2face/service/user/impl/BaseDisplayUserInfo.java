@@ -1,8 +1,8 @@
 package online.decentworld.face2face.service.user.impl;
 
 
-import online.decentworld.face2face.tools.MoneyUnitConverter;
 import online.decentworld.rdb.entity.User;
+import online.decentworld.tools.MoneyUnitConverter;
 
 /**
  * 用户对外基本信息
@@ -41,7 +41,7 @@ public class BaseDisplayUserInfo {
 		this.name=user.getName();
 		this.sex=user.getSex()==1?"男":"女";
 		this.sign=user.getSign();
-		this.worth=MoneyUnitConverter.fromFenToYuanStr(user.getWorth());
+		this.worth= MoneyUnitConverter.fromFenToYuanStr(user.getWorth());
 		this.wealth=MoneyUnitConverter.fromFenToYuanStr(wealth);
 				
 	}

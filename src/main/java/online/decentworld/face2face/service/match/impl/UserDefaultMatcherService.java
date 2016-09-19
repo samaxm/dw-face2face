@@ -1,26 +1,25 @@
 package online.decentworld.face2face.service.match.impl;
 
 
-import static online.decentworld.face2face.common.StatusCode.FAILED;
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
+import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.cache.MatchQueueCache;
 import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
-import online.decentworld.face2face.tools.RandomUtil;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-
+import online.decentworld.tools.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
-
 import java.util.List;
+
+import static online.decentworld.face2face.common.StatusCode.FAILED;
+import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 
 /**
  * 获取匹配用户，通过redis队列实现
@@ -30,8 +29,7 @@ import java.util.List;
 @Service
 public class UserDefaultMatcherService implements IUserMatcherService{
 	
-	@Autowired
-	private RandomUtil randomUtil;
+
 	@Autowired
 	private MatchQueueCache matchCache;
 	@Autowired
@@ -44,35 +42,67 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	 * 匹配等待队列数量，数量关系到了用户断线后重复遇到的几率以及用户等待的时间，该数值应当和当前在线人数相关，可弹性变化
 	 */
 	private int QUEUE_SIZE=3;
-	
+	/**
+	 * 优先队列序号
+	 */
+	private int PRIORITY_QUEUE_NUM=100;
+
 	/**
 	 * 客户端调取该接口获取匹配的用户，匹配的模式如下：
 	 * 根据匹配队列数目获取到随机的一个队列key值，然后通过redis的lpop命令从该key弹出一个值，若值为空表明该队列为空，则将本次请求用户ID插入队列，并返回告知客户端等待
 	 * 若值不为空则直接返回给客户端进行匹配通话。
 	 */
 	@Override
-	public ResultBean getMathUser(String dwID,String name,String icon) {
+	public ResultBean getMatchUser(String dwID,String name,String icon) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
 			bean.setStatusCode(FAILED);
 			bean.setMsg("抱歉，您被举报次数过多已被封号");
 		}else{
-			int index=randomUtil.getRandomNum(QUEUE_SIZE);
 			MatchUserInfo info=new MatchUserInfo(dwID, name, icon);
-			String matchUserInfo=matchCache.getMatchUser(info, index);
-			if(matchUserInfo==null){
-				  bean.setStatusCode(FAILED);
-				  bean.setMsg("搜索用户中...");
-				return bean;
-			}
-			MatchUserInfo matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
-			if(matched.getDwID().equals(dwID)){
-				bean.setStatusCode(FAILED);
-				bean.setMsg("搜索用户中...");
-			}else{
-				bean.setStatusCode(SUCCESS);
-				bean.getData().put("matchID", matched);
-			}
+			MatchUserInfo matched;
+			do{
+				int index=RandomUtil.getRandomNum(QUEUE_SIZE);
+				String matchUserInfo=matchCache.getMatchUser(info, index);
+				if(matchUserInfo==null){
+					bean.setStatusCode(FAILED);
+					bean.setMsg("搜索用户中...");
+					return bean;
+				}
+				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
+			}while (matched.getDwID().equals(dwID));
+			bean.setStatusCode(SUCCESS);
+			bean.getData().put("matchID", matched);
+		}
+		return bean;
+	}
+
+	@Override
+	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon, boolean isPrioritized) {
+		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
+		if(reportService.isUserBlock(dwID)){
+			bean.setStatusCode(FAILED);
+			bean.setMsg("抱歉，您被举报次数过多已被封号");
+		}else{
+			MatchUserInfo info=new MatchUserInfo(dwID, name, icon);
+			MatchUserInfo matched;
+			String matchUserInfo;
+			do{
+				if(isPrioritized){
+					matchUserInfo=matchCache.getMatchUser(info, PRIORITY_QUEUE_NUM);
+				}else {
+					int index = RandomUtil.getRandomNum(QUEUE_SIZE);
+					matchUserInfo= matchCache.getMatchUser(info, index);
+				}
+				if(matchUserInfo==null){
+					bean.setStatusCode(FAILED);
+					bean.setMsg("搜索用户中...");
+					return bean;
+				}
+				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
+			}while (matched.getDwID().equals(dwID));
+			bean.setStatusCode(SUCCESS);
+			bean.getData().put("matchID", matched);
 		}
 		return bean;
 	}

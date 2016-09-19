@@ -1,10 +1,10 @@
 package online.decentworld.face2face.config;
 
-import java.lang.reflect.Field;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.util.Properties;
 
 /**
  * load config from properties files
@@ -15,7 +15,7 @@ public class ConfigLoader {
 	
 	private static Logger logger=LoggerFactory.getLogger(ConfigLoader.class);
 	final private static String API_CONFIG_FILE="api.properties";
-	final private static String DATASOURCE_CONFIG_FILE="DataSource.properties";
+	final private static String DATASOURCE_CONFIG_FILE= "dataSource.properties";
 	final private static String CODIS_CONFIG_FILE="codis_config.properties";
 	final private static String SECURITY_CONFIG_FILE="security.properties";
 	final private static String AMIN_CONFIG_FILE="admin.properties";

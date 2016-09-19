@@ -1,6 +1,6 @@
 package online.decentworld.face2face.config;
 
-import static online.decentworld.face2face.tools.LogUtil.toLogString;
+import static online.decentworld.face2face.tools.WebLogUtil.toLogString;
 
 import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;

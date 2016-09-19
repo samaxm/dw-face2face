@@ -1,16 +1,16 @@
 package online.decentworld.face2face.service.security.token.impl;
 
-import static online.decentworld.face2face.common.StatusCode.FAILED;
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 import online.decentworld.face2face.cache.SecurityCache;
 import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
-import online.decentworld.face2face.tools.IDUtil;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
-
+import online.decentworld.tools.IDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static online.decentworld.face2face.common.StatusCode.FAILED;
+import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 
 @Service
 public class RedisTokenCheckService implements ITokenCheckService{
@@ -34,7 +34,7 @@ public class RedisTokenCheckService implements ITokenCheckService{
 		String cacheCode=tokenCache.getPhoneCodeCache(phoneNum, type);
 		ObjectResultBean bean=new ObjectResultBean();
 		if(cacheCode!=null&&cacheCode.equals(code)){
-			String token=IDUtil.randomToken();
+			String token= IDUtil.randomToken();
 			tokenCache.cacheToken(dwID, TokenType.CHANGEPWD, token);
 			bean.setStatusCode(SUCCESS);
 			bean.setData(token);

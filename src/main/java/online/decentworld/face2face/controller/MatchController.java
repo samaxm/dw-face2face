@@ -29,7 +29,7 @@ public class MatchController {
 	@RequestMapping("/getMatch")
 	@ResponseBody
 	public ResultBean getMatchUser(@RequestParam String dwID,@RequestParam String name,@RequestParam String icon,HttpServletRequest request){
-		return matchService.getMathUser(dwID,name,icon);	
+		return matchService.getMatchUser(dwID, name, icon);
 	}
 
 	@RequestMapping("/like")
@@ -43,6 +43,13 @@ public class MatchController {
 	@ResponseBody
 	public ResultBean likeRecords(@RequestParam String dwID){
 		return matchService.getLikeRecords(dwID);
+	}
+
+	@Frequency(limit=15,time=15000)
+	@RequestMapping("/getMatch/v2")
+	@ResponseBody
+	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,@RequestParam String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
+		return matchService.getMatchUserWithPriority(dwID,name,icon,isPrioritized);
 	}
 
 

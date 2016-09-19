@@ -4,21 +4,18 @@ import online.decentworld.face2face.cache.SecurityCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
-import online.decentworld.face2face.tools.AES;
-import online.decentworld.face2face.tools.MD5;
-import online.decentworld.face2face.tools.RSA;
 import online.decentworld.rdb.mapper.UserMapper;
-
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.AES;
+import online.decentworld.tools.MD5;
+import online.decentworld.tools.RSA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 @Service
@@ -62,7 +59,7 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	@Override
 	public boolean checkPassword(String dwID, String password) {
 		password= AES.decode(password);
-		password=MD5.GetMD5Code(password);
+		password= MD5.GetMD5Code(password);
 		String storePWD=userMapper.getUserPassword(dwID);
 		if(storePWD.equals(password))
 			return true;

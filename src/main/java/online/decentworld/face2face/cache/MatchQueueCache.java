@@ -51,7 +51,7 @@ public class MatchQueueCache extends RedisTemplate {
 	 * @return
 	 */
 	public String getMatchUser(MatchUserInfo userInfo,int index){
-		logger.debug("[GET_MATCH]");
+		logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID()+" index#"+index);
 		ReturnResult result=cache((Jedis jedis)->{
 			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
 			if(info!=null){

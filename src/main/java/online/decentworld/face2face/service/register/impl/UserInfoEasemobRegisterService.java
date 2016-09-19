@@ -8,15 +8,15 @@ import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
-import online.decentworld.face2face.tools.AES;
-import online.decentworld.face2face.tools.IDUtil;
-import online.decentworld.face2face.tools.MD5;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.AES;
+import online.decentworld.tools.IDUtil;
+import online.decentworld.tools.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
                         bean.setData(resetFields(isuser));
                         return bean;
                     }
-                    password=MD5.GetMD5Code(unionid);
+                    password= MD5.GetMD5Code(unionid);
                 }
             }else{
                 password=MD5.GetMD5Code(AES.decode(user.getPassword()));
@@ -120,7 +120,7 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
         int attemp=0;
         while(true){
             attemp++;
-            trimName(user);
+            user=trimName(user);
             try{
                 userMapper.insert(user);
                 break;
@@ -146,5 +146,13 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
     private User resetFields(User user){
         user.setPassword(null);
         return user;
+    }
+
+    public static void main(String[] args) {
+        UserInfoEasemobRegisterService info=new UserInfoEasemobRegisterService();
+        User user=new User();
+        user.setName("1234567890asdfgvbasd1234567890");
+        info.trimName(user);
+        System.out.println(user.getName());
     }
 }

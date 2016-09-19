@@ -1,24 +1,23 @@
 package online.decentworld.face2face.service.security.report.impl;
 
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.BLOCK_TIME;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.MAX_REPORTED;
+import online.decentworld.face2face.cache.SecurityCache;
+import online.decentworld.face2face.service.security.report.IReportService;
+import online.decentworld.rdb.entity.ReportRecord;
+import online.decentworld.rdb.mapper.ReportRecordMapper;
+import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.DateFormater;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
-import online.decentworld.face2face.cache.SecurityCache;
-import online.decentworld.face2face.service.security.report.IReportService;
-import online.decentworld.face2face.tools.DateFormater;
-import online.decentworld.rdb.entity.ReportRecord;
-import online.decentworld.rdb.mapper.ReportRecordMapper;
-import online.decentworld.rpc.dto.api.ResultBean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static online.decentworld.face2face.common.StatusCode.SUCCESS;
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.BLOCK_TIME;
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.MAX_REPORTED;
 
 @Service
 public class DefaultReportService implements IReportService{
@@ -41,7 +40,7 @@ public class DefaultReportService implements IReportService{
 			reportedTimes=reportMapper.countReportedTimes(reportedID);
 		}
 		if(reportedTimes>MAX_REPORTED){
-			logger.info("[BLOCK_USER] reportedID#"+reportedID+" time#"+DateFormater.formatReadableString(new Date()));
+			logger.info("[BLOCK_USER] reportedID#"+reportedID+" time#"+ DateFormater.formatReadableString(new Date()));
 			blockTable.put(reportedID, System.currentTimeMillis());
 		}
 		ResultBean bean=new ResultBean();

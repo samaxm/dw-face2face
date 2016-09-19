@@ -1,19 +1,18 @@
 package online.decentworld.face2face.service.match.impl;
 
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
+import online.decentworld.face2face.service.match.IRetrivePaddingContentService;
+import online.decentworld.rdb.entity.Joke;
+import online.decentworld.rdb.mapper.JokeMapper;
+import online.decentworld.rpc.dto.api.ListResultBean;
+import online.decentworld.tools.RandomUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import online.decentworld.face2face.service.match.IRetrivePaddingContentService;
-import online.decentworld.face2face.tools.RandomUtil;
-import online.decentworld.rdb.entity.Joke;
-import online.decentworld.rdb.mapper.JokeMapper;
-import online.decentworld.rpc.dto.api.ListResultBean;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 
 @Service
 public class RetriveJokeService implements IRetrivePaddingContentService{
@@ -21,8 +20,7 @@ public class RetriveJokeService implements IRetrivePaddingContentService{
 
 	@Autowired
 	private JokeMapper mapper;
-	@Autowired
-	private RandomUtil random;
+
 	
 	private String[] data;
 	
@@ -53,7 +51,7 @@ public class RetriveJokeService implements IRetrivePaddingContentService{
 	
 	
 	private List<String> getJokes(int index){
-		int step=random.getRandomNum(RETURN_SIZE);
+		int step=RandomUtil.getRandomNum(RETURN_SIZE);
 		if(data==null){
 			initData();
 		}

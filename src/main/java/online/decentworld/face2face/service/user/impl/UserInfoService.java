@@ -1,35 +1,28 @@
 package online.decentworld.face2face.service.user.impl;
 
-import static online.decentworld.face2face.common.StatusCode.FAILED;
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
-
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
-import online.decentworld.face2face.tools.MD5;
-import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.UserInfo;
 import online.decentworld.rdb.entity.Wealth;
-import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rdb.mapper.UserInfoMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
-import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-
+import online.decentworld.tools.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.fastjson.JSON;
+import static online.decentworld.face2face.common.StatusCode.FAILED;
+import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 @Service
 public class UserInfoService implements IUserInfoService{
 	@Autowired
@@ -112,7 +105,7 @@ public class UserInfoService implements IUserInfoService{
 	@Override
 	public ResultBean setPassword(String dwID, String password,String token) {
 		ResultBean bean=new ResultBean();
-		password=MD5.GetMD5Code(password);
+		password= MD5.GetMD5Code(password);
 		if(tokenService.checkToken(dwID, TokenType.CHANGEPWD, token)){
 			User user=new User();
 			user.setId(dwID);user.setPassword(password);

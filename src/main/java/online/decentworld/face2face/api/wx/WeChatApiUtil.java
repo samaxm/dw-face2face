@@ -1,26 +1,20 @@
 package online.decentworld.face2face.api.wx;
 
-import static online.decentworld.face2face.config.ConfigLoader.APIConfig.*;
-import static online.decentworld.face2face.tools.HttpRequestUtil.*;
-
-import java.io.IOException;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import online.decentworld.face2face.exception.GetWXAccessTokenError;
 import online.decentworld.face2face.exception.GetWXInfoError;
-import online.decentworld.face2face.tools.HttpHeader;
-
+import online.decentworld.tools.HttpHeader;
+import online.decentworld.tools.HttpRequestUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
-
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import java.io.IOException;
+
+import static online.decentworld.face2face.config.ConfigLoader.APIConfig.*;
 
 /**
  * 微信相關接口
@@ -37,10 +31,10 @@ public class WeChatApiUtil {
 		sb.append(WX_ACCESS_TOKEN_URL).append("?appid=").append(WX_APP_ID).append("&secret=")
 		.append(WX_APP_SECRET).append("&code=").append(code).append("&grant_type=authorization_code");
 		try{
-			Response response=GET(sb.toString(), new HttpHeader[]{});
+			Response response= HttpRequestUtil.GET(sb.toString(), new HttpHeader[]{});
 			ResponseBody body=response.body();
 			JSONObject result=JSON.parseObject(body.string());
-			if(response.code()==SUCCESS&&isSuccess(result)){
+			if(response.code()==HttpRequestUtil.SUCCESS&&isSuccess(result)){
 					return JSON.toJavaObject(result,AccessTokenResult.class);
 			}else{
 				logger.warn("[GET_WX_ACCESS_TOKEN_ERROR] code#"+response.code());
@@ -58,9 +52,9 @@ public class WeChatApiUtil {
 		sb.append(GET_WX_USER_INFO).append("?access_token=").append(access.getAccess_token()).append("&openid=")
 		.append(access.getOpenid()).append("&lang=zh_CN");
 		try {
-			Response response = GET(sb.toString(),new HttpHeader[]{});
+			Response response = HttpRequestUtil.GET(sb.toString(), new HttpHeader[]{});
 			JSONObject jsonObject=JSON.parseObject(response.body().string());
-			if(response.code()==SUCCESS&&isSuccess(jsonObject)){
+			if(response.code()==HttpRequestUtil.SUCCESS&&isSuccess(jsonObject)){
 				WXInfo info = JSON.toJavaObject(jsonObject, WXInfo.class);
 				return info;
 			}else{
