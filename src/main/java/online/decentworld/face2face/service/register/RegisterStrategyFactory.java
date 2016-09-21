@@ -1,10 +1,8 @@
 package online.decentworld.face2face.service.register;
 
-import javax.annotation.Resource;
-
-import online.decentworld.face2face.common.RegisterType;
-
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * 註冊服務的簡單工廠
@@ -13,10 +11,14 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RegisterStrategyFactory {
+
+
 	@Resource(name="wxRegisterService")
 	private IRegisterService wxRegisterService;
 	@Resource(name = "userInfoEasemobRegisterService")
 	private IRegisterService userInfoEasemobRegisterService;
+	@Resource(name="phoneCodeRegisterService")
+	private IRegisterService phoneCodeRegisterService;
 
 	public IRegisterService getService(String registerType){
 		RegisterType type=RegisterType.valueOf(registerType);
@@ -24,7 +26,9 @@ public class RegisterStrategyFactory {
 			return wxRegisterService;
 		}else if(type==RegisterType.INFO){
 			return userInfoEasemobRegisterService;
-		}else {
+		}else if(type==RegisterType.PHONECODE) {
+			return phoneCodeRegisterService;
+		}else{
 			return null;
 		}
 	}

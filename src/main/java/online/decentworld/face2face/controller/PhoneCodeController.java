@@ -56,5 +56,12 @@ public class PhoneCodeController {
 			return tokenService.checkPhoneCodeAndCreateToken(dwID, phoneNum, phoneCode, PhoneCodeType.valueOf(type));
 		}
 	}
+//
+//	@RequestMapping("/register")
+//	@ResponseBody
+//	public ObjectResultBean register(@RequestParam String phoneNum,@RequestParam String phoneCode,@RequestParam String password){
+//
+//
+//	}
 
 }

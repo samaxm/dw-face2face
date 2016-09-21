@@ -72,23 +72,23 @@ public class UserInfoService implements IUserInfoService{
 
 	@Override
 	public ResultBean updateUserInfo(User user) {
-		ResultBean bean=new ResultBean();
-		if(user.getName().length()>10){
-			bean.setStatusCode(StatusCode.FAILED);
-			bean.setMsg("您的用戶名過長！最多十個字符");
-			return bean;
+		if(user.getName().length()>20){
+			return ResultBean.FAIL("您的用戶名過長！最多十個字符");
 		}else{
 			try{
-				user=UserFieldFilter(user);
-				userMapper.updateByPrimaryKeySelective(user);
+				String password=user.getPassword();
+				if(password.equals(userMapper.getUserPassword(user.getId()))){
+					user=UserFieldFilter(user);
+					userMapper.updateByPrimaryKeySelective(user);
+					return ResultBean.SUCCESS;
+				}else{
+					return ResultBean.FAIL("身份校验错误");
+				}
 			}catch(DuplicateKeyException ex){
 				logger.info("[REPEAT_NAME] user#"+JSON.toJSONString(user),ex);
-				bean.setStatusCode(StatusCode.FAILED);
-				bean.setMsg("該用戶名已被使用！");
-				return bean;
+				return ResultBean.FAIL("該用戶名已被使用！");
 			}
 		}
-		return ResultBean.SUCCESS;
 	}
 	
 	

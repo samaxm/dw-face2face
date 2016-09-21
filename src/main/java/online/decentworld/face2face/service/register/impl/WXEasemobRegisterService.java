@@ -42,7 +42,7 @@ public class WXEasemobRegisterService implements IRegisterService{
 
 	
 	private static Logger logger=LoggerFactory.getLogger(WXEasemobRegisterService.class);
-	
+
 	@Override
 	public ObjectResultBean register(String code) {
 		ObjectResultBean bean=new ObjectResultBean();
