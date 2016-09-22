@@ -36,4 +36,11 @@ public class AppController {
 		return bean;
 	}
 
+
+	@RequestMapping("/onlineStatus")
+	@ResponseBody
+	public ResultBean getOnlineNum(int count){
+		return appService.getOnlineStatus(count);
+	}
+
 }

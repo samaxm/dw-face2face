@@ -1,11 +1,8 @@
 package online.decentworld.face2face.config;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.service.security.request.impl.LocalRequestLimit;
 import online.decentworld.face2face.tools.WebLogUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -21,15 +19,13 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import com.alibaba.fastjson.JSON;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -100,7 +96,18 @@ public class ServletConfig extends WebMvcConfigurerAdapter{
 	public void configureDefaultServletHandling(
 			DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
+
 	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/img/**").addResourceLocations("/img/").setCachePeriod(31556926);
+		registry.addResourceHandler("/view/**").addResourceLocations("/WEB-INF/view/").setCacheControl(CacheControl.noCache());
+		registry.addResourceHandler("/js/**").addResourceLocations("/WEB-INF/js/");
+
+
+	}
+
 	/**
 	 * 异常脑残。。方法名字必须这样
 	 * @return

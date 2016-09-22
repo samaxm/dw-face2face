@@ -1,7 +1,7 @@
 package online.decentworld.face2face.controller;
 
 import online.decentworld.face2face.annotation.Frequency;
-import online.decentworld.face2face.service.security.StatisticsService;
+import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,7 +17,7 @@ public class UserActivityController {
 
 
     @Autowired
-    private StatisticsService statisticsService;
+    private IAppService appService;
 
 
     @RequestMapping("/login")
@@ -38,7 +38,6 @@ public class UserActivityController {
     @ResponseBody
     @Frequency(time=5*60*1000,limit =2)
     public ResultBean markOnline(String dwID,String info){
-        statisticsService.markOnline(dwID);
-        return ResultBean.SUCCESS;
+        return appService.markOnline(dwID);
     }
 }

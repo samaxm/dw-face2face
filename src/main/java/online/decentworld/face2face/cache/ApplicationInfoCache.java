@@ -13,10 +13,22 @@ public class ApplicationInfoCache extends RedisTemplate {
 
     private long MAX_ONLINE=0;
     private long MAX_IDLE_TIME=10*60*1000;
+
+    public ApplicationInfoCache(){
+        cache((Jedis jedis)->{
+            String max=jedis.get(WebCacheKey.MAX_ONLINE);
+            if(max!=null){
+                MAX_ONLINE=Long.valueOf(max);
+            }else{
+                jedis.set(WebCacheKey.MAX_ONLINE,"0");
+            }
+            return ReturnResult.SUCCESS;
+        });
+    }
     public void markOnline(String dwID){
         ReturnResult result=cache((Jedis jedis) -> {
             jedis.zadd(WebCacheKey.ONLINE_NUM, System.currentTimeMillis(), dwID);
-            return ReturnResult.result(jedis.zcount(WebCacheKey.ONLINE_NUM, 0, -1));
+            return ReturnResult.result(jedis.zcount(WebCacheKey.ONLINE_NUM, 0, Long.MAX_VALUE));
         });
         long size=(long)result.getResult();
         if(size>MAX_ONLINE){
@@ -33,10 +45,18 @@ public class ApplicationInfoCache extends RedisTemplate {
     }
 
 
-    public void checkOnline(){
-        cache((Jedis jedis)->{
+    public long checkOnline(){
+        return (long)cache((Jedis jedis)->{
             jedis.zremrangeByScore(WebCacheKey.ONLINE_NUM,0,System.currentTimeMillis()-MAX_IDLE_TIME);
-            return ReturnResult.SUCCESS;
-        });
+            long online=jedis.zcount(WebCacheKey.ONLINE_NUM,0, Long.MAX_VALUE);
+            return ReturnResult.result(online);
+        }).getResult();
+
     }
+
+    public long getMAX_ONLINE() {
+        return MAX_ONLINE;
+    }
+
+
 }

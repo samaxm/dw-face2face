@@ -1,9 +1,11 @@
 package online.decentworld.face2face.controller;
 
 import online.decentworld.face2face.common.PhoneCodeType;
+import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.RegisterStrategyFactory;
 import online.decentworld.face2face.service.sms.SMSService;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.IDUtil;
 import org.slf4j.Logger;
@@ -48,13 +50,18 @@ public class UserRegisterController {
     @ResponseBody
     public ResultBean registerV2(@RequestParam String registerInfo,@RequestParam String registerType,HttpServletRequest request) throws IOException, ServletException {
 
-        ResultBean bean=null;
+        ObjectResultBean bean=null;
 
         IRegisterService service=registerService.getService(registerType.toUpperCase());
         if(service==null){
             ResultBean.FAIL("注册类型错误");
         }else{
-            bean=service.register(registerInfo);
+//            bean=service.register(registerInfo);
+            bean=new ObjectResultBean();
+            bean.setStatusCode(StatusCode.SUCCESS);
+            bean.setMsg("test");
+            bean.setData("123");
+
         }
         return bean;
     }
