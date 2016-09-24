@@ -1,6 +1,5 @@
 package online.decentworld.face2face.controller;
 
-import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
@@ -32,7 +31,7 @@ public class PhoneCodeController {
 	
 	@RequestMapping("/send")
 	@ResponseBody
-	@Frequency(limit = 3,time = 6000)
+//	@Frequency(limit = 3,time = 6000)
 	public ResultBean sendRegisterPhoneCode(@RequestParam String phoneNum,@RequestParam String type){
 		
 		if(type==null||PhoneCodeType.valueOf(type)==null){
@@ -47,7 +46,7 @@ public class PhoneCodeController {
 	
 	@RequestMapping("/check")
 	@ResponseBody
-	public ObjectResultBean checkPhoneCode(@RequestParam String dwID,@RequestParam String phoneCode,@RequestParam String phoneNum,@RequestParam String type){
+	public ObjectResultBean checkPhoneCode(@RequestParam String phoneCode,@RequestParam String phoneNum,@RequestParam String type){
 		
 		if(type==null||PhoneCodeType.valueOf(type)==null){
 			ObjectResultBean bean=new ObjectResultBean();
@@ -55,7 +54,7 @@ public class PhoneCodeController {
 			bean.setStatusCode(StatusCode.FAILED);
 			return bean;
 		}else{
-			return tokenService.checkPhoneCodeAndCreateToken(dwID, phoneNum, phoneCode, PhoneCodeType.valueOf(type));
+			return tokenService.checkPhoneCodeAndCreateToken(phoneNum, phoneCode, PhoneCodeType.valueOf(type));
 		}
 	}
 //

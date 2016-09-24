@@ -1,6 +1,6 @@
 package online.decentworld.face2face.exception;
 
-public class EasemobRegisterFailed extends Exception{
+public class EasemobAPIException extends Exception{
 
 	public static int PARAMS_ERROR=400;
 	public static int IO_ERROR=-1;
@@ -12,7 +12,7 @@ public class EasemobRegisterFailed extends Exception{
 
 	private int errcode;
 	
-	public EasemobRegisterFailed(int errcode){
+	public EasemobAPIException(int errcode){
 		this.setErrcode(errcode);
 	}
 

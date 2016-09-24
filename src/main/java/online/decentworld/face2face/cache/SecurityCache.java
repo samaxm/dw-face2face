@@ -76,19 +76,19 @@ public class SecurityCache extends RedisTemplate{
 	}
 	
 	
-	public void cacheToken(String dwID,TokenType type,String token){
+	public void cacheToken(String key,TokenType type,String token){
 		cache((Jedis jedis)->{
 			jedis=RedisClient.getJedis();
-			jedis.setex(WebCacheKey.TOKEN_KEY(dwID,type),TOKEN_EXPIRE,token);
+			jedis.setex(WebCacheKey.TOKEN_KEY(key,type),TOKEN_EXPIRE,token);
 			return SUCCESS;
 		});
 	}
 	
-	public String getToken(String dwID,TokenType type){
+	public String getToken(String key,TokenType type){
 		ReturnResult result=cache((Jedis jedis)->{
 			jedis=RedisClient.getJedis();
-			String key=WebCacheKey.TOKEN_KEY(dwID, type);
-			String code=jedis.get(key);
+			String redisKey=WebCacheKey.TOKEN_KEY(key, type);
+			String code=jedis.get(redisKey);
 			return result(code);
 		});
 		return (String)result.getResult();

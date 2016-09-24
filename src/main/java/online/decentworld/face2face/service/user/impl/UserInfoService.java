@@ -92,7 +92,7 @@ public class UserInfoService implements IUserInfoService{
 	}
 	
 	
-	private User UserFieldFilter(User user){
+	public static User UserFieldFilter(User user){
 		user.setPassword(null);
 		user.setOpenid(null);
 		user.setUnionid(null);
@@ -102,21 +102,7 @@ public class UserInfoService implements IUserInfoService{
 		return user;
 	}
 
-	@Override
-	public ResultBean setPassword(String dwID, String password,String token) {
-		ResultBean bean=new ResultBean();
-		password= MD5.GetMD5Code(password);
-		if(tokenService.checkToken(dwID, TokenType.CHANGEPWD, token)){
-			User user=new User();
-			user.setId(dwID);user.setPassword(password);
-			userMapper.updateByPrimaryKeySelective(user);
-			bean.setStatusCode(StatusCode.SUCCESS);
-		}else{
-			bean.setStatusCode(StatusCode.FAILED);
-			bean.setMsg("驗證碼錯誤");
-		}
-		return bean;
-	}
+
 
 
 

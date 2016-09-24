@@ -8,7 +8,7 @@ public interface ITokenCheckService {
 	
 	public boolean checkPhoneCode(String phoneNum,PhoneCodeType type,String code);
 	
-	public boolean checkToken(String dwID,TokenType type,String token);
+	public boolean checkToken(String key,TokenType type,String token);
 	
-	public ObjectResultBean checkPhoneCodeAndCreateToken(String dwID,String phoneNum,String code,PhoneCodeType type);
+	public ObjectResultBean checkPhoneCodeAndCreateToken(String phoneNum,String code,PhoneCodeType type);
 }

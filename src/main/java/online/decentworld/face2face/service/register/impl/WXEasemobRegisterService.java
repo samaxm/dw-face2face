@@ -67,7 +67,7 @@ public class WXEasemobRegisterService implements IRegisterService{
 			bean.setStatusCode(StatusCode.FAILED);
 			bean.setMsg("获取微信授权信息失败");
 			logger.warn("[WX_REGISTER_RETRIVEINFO_FAILED]",e);
-		}catch (EasemobRegisterFailed|GetEasemobTokenException|RegisterFailException e) {
+		}catch (EasemobAPIException |GetEasemobTokenException|RegisterFailException e) {
 			bean.setStatusCode(StatusCode.FAILED);
 			bean.setMsg("注册失败");
 			logger.warn("[WX_REGISTER_EASEMOB_FAILED]",e);

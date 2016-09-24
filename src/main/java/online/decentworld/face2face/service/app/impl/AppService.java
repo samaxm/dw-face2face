@@ -9,9 +9,12 @@ import online.decentworld.rdb.mapper.AppVersionMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,18 +25,27 @@ public class AppService implements IAppService{
 	private AppVersionMapper versionMapper;
 	@Autowired
 	private ApplicationInfoCache applicationInfoCache;
-
+	private static Logger logger= LoggerFactory.getLogger(AppService.class);
 	private static int onlineCheckPeriod=60000;
 	public AppService(){
+
+	}
+
+	@PostConstruct
+	public void startTimer(){
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
-				long currentOnline=applicationInfoCache.checkOnline();
-				OnlineStatusDB.storeCurrentOnlineNum(currentOnline);
+				try {
+					long currentOnline=applicationInfoCache.checkOnline();
+					OnlineStatusDB.storeCurrentOnlineNum(currentOnline);
+				}catch (Exception e){
+					logger.debug("",e);
+				}
+
 			}
 		}, 1000, onlineCheckPeriod);
 	}
-
 
 
 	@Override

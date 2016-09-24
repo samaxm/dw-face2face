@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static online.decentworld.face2face.common.StatusCode.FAILED;
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 
 @Service
 public class RedisTokenCheckService implements ITokenCheckService{
@@ -29,15 +28,13 @@ public class RedisTokenCheckService implements ITokenCheckService{
 	}
 
 	@Override
-	public ObjectResultBean checkPhoneCodeAndCreateToken(String dwID,
-			String phoneNum, String code, PhoneCodeType type) {
+	public ObjectResultBean checkPhoneCodeAndCreateToken(String phoneNum, String code, PhoneCodeType type) {
 		String cacheCode=tokenCache.getPhoneCodeCache(phoneNum, type);
 		ObjectResultBean bean=new ObjectResultBean();
 		if(cacheCode!=null&&cacheCode.equals(code)){
 			String token= IDUtil.randomToken();
-			tokenCache.cacheToken(dwID, TokenType.CHANGEPWD, token);
-			bean.setStatusCode(SUCCESS);
-			bean.setData(token);
+			tokenCache.cacheToken(phoneNum, TokenType.CHANGEPWD, token);
+			bean=ObjectResultBean.SUCCESS(token);
 		}else{
 			bean.setStatusCode(FAILED);
 			bean.setMsg("驗證碼錯誤");
@@ -46,8 +43,8 @@ public class RedisTokenCheckService implements ITokenCheckService{
 	}
 
 	@Override
-	public boolean checkToken(String dwID, TokenType type, String token) {
-		String cacheToken=tokenCache.getToken(dwID, type);
+	public boolean checkToken(String key, TokenType type, String token) {
+		String cacheToken=tokenCache.getToken(key, type);
 		if(cacheToken!=null&&cacheToken.equals(token)){
 			return true;
 		}else{

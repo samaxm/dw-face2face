@@ -50,13 +50,6 @@ public class UserInfoController {
 		
 		return userService.bindUserPhoneNum(dwID, phoneNum, code);
 	}
-	
-	@RequestMapping("/set/password")
-	@ResponseBody
-	public ResultBean setPassword(@RequestParam String dwID,@RequestParam String token,@RequestParam String password){
-		
-		return userService.setPassword(dwID, password,token);
-	}
 
 
 	@RequestMapping("/set/info")

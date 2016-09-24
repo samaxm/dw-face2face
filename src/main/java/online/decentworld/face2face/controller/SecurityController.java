@@ -1,18 +1,16 @@
 package online.decentworld.face2face.controller;
 
-import static online.decentworld.face2face.common.StatusCode.FAILED;
-
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import online.decentworld.face2face.annotation.Frequency;
+import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.service.security.advice.IAdviceService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.report.IReportService;
+import online.decentworld.face2face.service.security.token.ITokenCheckService;
+import online.decentworld.face2face.service.sms.SMSService;
 import online.decentworld.rdb.entity.CustomAdvice.AdviceType;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-
+import online.decentworld.tools.IDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+
+import static online.decentworld.face2face.common.StatusCode.FAILED;
 
 @RequestMapping("/security")
 @Controller
@@ -31,6 +34,10 @@ public class SecurityController {
 	private IAdviceService adviceService;
 	@Autowired
 	private IUserAuthorityService authorityService;
+	@Autowired
+	private SMSService SMSservice;
+	@Autowired
+	private ITokenCheckService tokenService;
 	
 	@RequestMapping("/report")
 	@ResponseBody
@@ -78,5 +85,21 @@ public class SecurityController {
 		return authorityService.getRSAKey();
 	}
 
+	@RequestMapping("/forget/password")
+	@ResponseBody
+	@Frequency(limit = 3,time = 6000)
+	public ResultBean resetPassword(@RequestParam String phoneNum){
+		if(phoneNum.length()!=11){
+			return ResultBean.FAIL("请输入11位手机号码");
+		}
+		return SMSservice.sendPhoneCode(phoneNum, PhoneCodeType.SETPWD, IDUtil.createRandomCode());
+	}
+
+
+	@RequestMapping("/forget/password/check")
+	@ResponseBody
+	public ObjectResultBean checkPhoneCode(@RequestParam String phoneCode,@RequestParam String phoneNum){
+		return tokenService.checkPhoneCodeAndCreateToken(phoneNum, phoneCode, PhoneCodeType.SETPWD);
+	}
 
 }
