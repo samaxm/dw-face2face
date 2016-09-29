@@ -9,6 +9,8 @@ public interface ITokenCheckService {
 	public boolean checkPhoneCode(String phoneNum,PhoneCodeType type,String code);
 	
 	public boolean checkToken(String key,TokenType type,String token);
-	
+
+	public void cacheToken(String token, String key, TokenType type);
+
 	public ObjectResultBean checkPhoneCodeAndCreateToken(String phoneNum,String code,PhoneCodeType type);
 }

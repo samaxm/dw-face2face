@@ -95,9 +95,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 					matchUserInfo= matchCache.getMatchUser(info, index);
 				}
 				if(matchUserInfo==null){
-					bean.setStatusCode(FAILED);
-					bean.setMsg("搜索用户中...");
-					return bean;
+					return  ResultBean.FAIL("搜索用户中...");
 				}
 				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
 			}while (matched.getDwID().equals(dwID));

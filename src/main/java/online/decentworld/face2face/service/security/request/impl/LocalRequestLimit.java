@@ -1,18 +1,19 @@
 package online.decentworld.face2face.service.security.request.impl;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.*;
+import online.decentworld.face2face.annotation.Frequency;
+import online.decentworld.face2face.service.security.request.RequestLimit;
+import online.decentworld.tools.IPHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import online.decentworld.face2face.annotation.Frequency;
-import online.decentworld.face2face.service.security.request.RequestLimit;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.*;
 
 public class LocalRequestLimit extends HandlerInterceptorAdapter implements RequestLimit{
 
@@ -37,7 +38,7 @@ public class LocalRequestLimit extends HandlerInterceptorAdapter implements Requ
 			return true;
 		}else{
 			String methodName=((HandlerMethod)handler).getMethod().getName();
-			String ip=getLocalIP(request);
+			String ip= IPHelper.getLocalIP(request);
 			if(!isBlock(ip)){
 				return checkFrequency(mf, ip, methodName);	
 			}else{
@@ -83,26 +84,7 @@ public class LocalRequestLimit extends HandlerInterceptorAdapter implements Requ
 		}
 	}
 	
-	private String getLocalIP(HttpServletRequest request){
-		String ip = request.getHeader("x-forwarded-for"); 
-	    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { 
-	      ip = request.getHeader("Proxy-Client-IP"); 
-	    } 
-	    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { 
-	      ip = request.getHeader("WL-Proxy-Client-IP"); 
-	    } 
-	    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { 
-	      ip = request.getHeader("HTTP_CLIENT_IP"); 
-	    } 
-	    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { 
-	      ip = request.getHeader("HTTP_X_FORWARDED_FOR"); 
-	    } 
-	    if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { 
-	      ip = request.getRemoteAddr(); 
-	    } 
-	    logger.debug("[GET_REMOTE_IP] IP#"+ip);
-	    return ip; 
-	}
+
 	
 	private void cleanCache(){
 		for(String key:REQUEST_CACHE.keySet()){

@@ -10,6 +10,22 @@ public interface IUserInfoService {
 	public ObjectResultBean getUserInfo(String dwID);
 	
 	public ResultBean updateUserInfo(User user);
-	
 
+	/**
+	 * 设置支付密码前先通过登录密码获取令牌
+	 * @param dwID
+	 * @param password
+	 * @return
+	 */
+	public ResultBean preSetUserPayPassword(String dwID,String password);
+	/**
+	 *
+	 * @param dwID
+	 * @param payPassword
+	 * @return
+	 */
+	public ResultBean setUserPayPassword(String dwID,String payPassword,String token);
+
+
+	public ResultBean getUserWealth(String dwID);
 }

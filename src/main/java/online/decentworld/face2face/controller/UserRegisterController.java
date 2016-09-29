@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by Sammax on 2016/9/21.
@@ -46,10 +47,10 @@ public class UserRegisterController {
 
     @RequestMapping("/v2")
     @ResponseBody
-    public ResultBean registerV2(@RequestParam String registerInfo,@RequestParam String registerType,HttpServletRequest request) throws IOException, ServletException {
+    public ResultBean registerV2( String registerInfo,@RequestParam String registerType,HttpServletRequest request) throws IOException, ServletException {
 
         ResultBean bean=null;
-
+        Map<String, String[]> map= request.getParameterMap();
         IRegisterService service=registerService.getService(registerType.toUpperCase());
         if(service==null){
             ResultBean.FAIL("注册类型错误");

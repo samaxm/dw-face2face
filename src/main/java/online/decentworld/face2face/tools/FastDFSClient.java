@@ -1,20 +1,13 @@
 package online.decentworld.face2face.tools;
 
-import java.io.IOException;
-
 import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.config.ConfigLoader;
-
-import org.csource.common.NameValuePair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.csource.fastdfs.ClientGlobal;
-import org.csource.fastdfs.FileInfo;
-import org.csource.fastdfs.ServerInfo;
-import org.csource.fastdfs.StorageClient;
-import org.csource.fastdfs.StorageServer;
-import org.csource.fastdfs.TrackerClient;
-import org.csource.fastdfs.TrackerServer;
+import org.csource.common.NameValuePair;
+import org.csource.fastdfs.*;
+
+import java.io.IOException;
 
 public class FastDFSClient implements FileManagerConfig{
 	 
@@ -29,7 +22,7 @@ public class FastDFSClient implements FileManagerConfig{
 
 	  static { // Initialize Fast DFS Client configurations
 	    try {
-	      String path=ConfigLoader.class.getResource("").getPath();
+	      String path=ConfigLoader.class.getClassLoader().getResource("").getPath();
 	       path=path+CLIENT_CONFIG_FILE;
 //	      path=new File().getCanonicalPath();
 //	      logger.info("Fast DFS configuration file path:" + fdfsClientConfigFilePath);
@@ -44,14 +37,7 @@ public class FastDFSClient implements FileManagerConfig{
 	    }
 	  }
 	  
-	  public static void main(String[] args) {
-		  try {
-			Class.forName("online.decentworld.face2face.tools.FastDFSClient");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	  }
+
 	  
 	  public static String upload(byte[] content,String ext_name,NameValuePair[] meta_list) throws Exception {
 		    String[] uploadResults = null;
@@ -129,6 +115,21 @@ public class FastDFSClient implements FileManagerConfig{
 	  }
 
 	public static String getFullURL(String url){
-		return CommonProperties.HTTP+ ConfigLoader.DomainConfig.FDFS_DOMAIN+"/"+url;
+		return CommonProperties.HTTP+ ConfigLoader.DomainConfig.FDFS_DOMAIN+url;
+	}
+
+	public static void deleteByFullName(String url){
+		String sub=url.substring(url.indexOf("group"));
+		try {
+			String group=sub.substring(0,sub.indexOf("/"));
+			String file=sub.substring(sub.indexOf("/") + 1);
+			deleteFile(group,file);
+		} catch (Exception e) {
+			logger.info("[DELETE_FILE_FAILED]",e);
+		}
+	}
+
+	public static void main(String[] args) {
+		deleteByFullName("http://dev.service.dawan.online//group1/M00/00/12/cEodc1ftBdSASWZfAABxeKsD33E118.jpg");
 	}
 }

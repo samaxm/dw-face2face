@@ -1,11 +1,17 @@
 package online.decentworld.face2face.service.app.impl;
 
+import online.decentworld.charge.ChargeService;
+import online.decentworld.charge.event.RechargeEvent;
+import online.decentworld.charge.exception.IllegalChargeException;
+import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.cache.ApplicationInfoCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.app.OnlineStatusDB;
 import online.decentworld.rdb.entity.AppVersion;
+import online.decentworld.rdb.entity.Order;
 import online.decentworld.rdb.mapper.AppVersionMapper;
+import online.decentworld.rdb.mapper.OrderMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -25,6 +31,12 @@ public class AppService implements IAppService{
 	private AppVersionMapper versionMapper;
 	@Autowired
 	private ApplicationInfoCache applicationInfoCache;
+	@Autowired
+	private OrderMapper orderMapper;
+	@Autowired
+	private ChargeService chargeService;
+
+
 	private static Logger logger= LoggerFactory.getLogger(AppService.class);
 	private static int onlineCheckPeriod=60000;
 	public AppService(){
@@ -44,7 +56,7 @@ public class AppService implements IAppService{
 				}
 
 			}
-		}, 1000, onlineCheckPeriod);
+		}, 10000, onlineCheckPeriod);
 	}
 
 
@@ -70,5 +82,21 @@ public class AppService implements IAppService{
 		bean.getData().put("statusList",OnlineStatusDB.getOnlineStatuses(count));
 		bean.setStatusCode(StatusCode.SUCCESS);
 		return  bean;
+	}
+
+	@Override
+	public String getRechargeResponse(String orderNum, PayChannel channel, int amount) throws IllegalChargeException {
+		if(channel==PayChannel.WX){
+			Order order=orderMapper.selectByPrimaryKey(orderNum);
+			if(order.getAmount()!=amount){
+				logger.warn("[DIFFERENT_AMOUNT] orderNum#"+orderNum);
+				return null;
+			}
+			chargeService.charge(new RechargeEvent(order));
+			orderMapper.updateStatus(orderNum,true);
+		}else if(channel==PayChannel.ALIPAY){
+
+		}
+		return null;
 	}
 }

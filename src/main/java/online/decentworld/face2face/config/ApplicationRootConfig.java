@@ -1,7 +1,12 @@
 package online.decentworld.face2face.config;
 
 import online.decentworld.cache.config.CacheBeanConfig;
+import online.decentworld.charge.ChargeService;
+import online.decentworld.charge.ChargeServiceTemplate;
+import online.decentworld.charge.service.IOrderService;
+import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.rdb.config.DBConfig;
+import online.decentworld.rdb.mapper.OrderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
@@ -33,4 +38,18 @@ public class ApplicationRootConfig {
 		manager.setDataSource(ds);
 		return manager;
 	}
+
+	@Bean
+	public IOrderService getOrderService(OrderMapper orderMapper){
+		OrderService orderService=new OrderService();
+		orderService.setOrderMapper(orderMapper);
+		return orderService;
+	}
+
+	@Bean
+	public ChargeService getChargeService(OrderMapper orderMapper){
+
+		return new ChargeServiceTemplate();
+	}
+
 }

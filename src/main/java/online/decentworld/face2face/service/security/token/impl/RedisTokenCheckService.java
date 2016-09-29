@@ -52,4 +52,9 @@ public class RedisTokenCheckService implements ITokenCheckService{
 		}
 	}
 
+	@Override
+	public void cacheToken(String token, String key, TokenType type) {
+		tokenCache.cacheToken(key,type,token);
+	}
+
 }

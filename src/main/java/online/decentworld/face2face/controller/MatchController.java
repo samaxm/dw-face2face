@@ -28,7 +28,7 @@ public class MatchController {
 	@Frequency(limit=15,time=15000)
 	@RequestMapping("/getMatch")
 	@ResponseBody
-	public ResultBean getMatchUser(@RequestParam String dwID,@RequestParam String name,@RequestParam String icon,HttpServletRequest request){
+	public ResultBean getMatchUser(@RequestParam String dwID,@RequestParam String name,String icon,HttpServletRequest request){
 		return matchService.getMatchUser(dwID, name, icon);
 	}
 
@@ -48,9 +48,7 @@ public class MatchController {
 	@Frequency(limit=15,time=15000)
 	@RequestMapping("/getMatch/v2")
 	@ResponseBody
-	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,@RequestParam String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
+	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
 		return matchService.getMatchUserWithPriority(dwID,name,icon,isPrioritized);
 	}
-
-
 }

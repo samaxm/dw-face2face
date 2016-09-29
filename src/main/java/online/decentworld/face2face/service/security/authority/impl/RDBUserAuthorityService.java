@@ -4,11 +4,12 @@ import online.decentworld.face2face.cache.SecurityCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
+import online.decentworld.rdb.entity.PayPassword;
+import online.decentworld.rdb.mapper.PayPasswordMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.AES;
-import online.decentworld.tools.MD5;
 import online.decentworld.tools.RSA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,10 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	private UserMapper userMapper;
 	@Autowired
 	private SecurityCache securityCache;
+	@Autowired
+	private PayPasswordMapper payPasswordMapper;
+
+
 	private static Logger logger= LoggerFactory.getLogger(RDBUserAuthorityService.class);
 	final private static String RSA_PUBLIC ;
 	final private static String RSA_PRIVATE ;
@@ -35,8 +40,6 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 		try {
 			InputStream in = RDBUserAuthorityService.class.getClassLoader().getResourceAsStream(ConfigLoader.AdminConfig.RSA_PUBLIC);
 			InputStream in2 = RDBUserAuthorityService.class.getClassLoader().getResourceAsStream(ConfigLoader.AdminConfig.RSA_PRIVATE);
-
-
 			int c;
 			while ((c = in.read()) != -1) {
 				sb.append((char) c);
@@ -59,12 +62,21 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	@Override
 	public boolean checkPassword(String dwID, String password) {
 		password= AES.decode(password);
-		password= MD5.GetMD5Code(password);
 		String storePWD=userMapper.getUserPassword(dwID);
 		if(storePWD.equals(password))
 			return true;
 		else
 			return false;
+	}
+
+	@Override
+	public boolean checkPayPassword(String dwID, String payPassword) {
+		payPassword=AES.decode(payPassword,getUserKey(dwID));
+		PayPassword record=payPasswordMapper.selectByPrimaryKey(dwID);
+		if(record!=null&&record.getPayPassword().equals(payPassword)){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -100,6 +112,11 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 			bean.setMsg("system error,key error!");
 		}
 		return bean;
+	}
+
+	@Override
+	public String getUserKey(String dwID) {
+		return securityCache.getAES(dwID);
 	}
 
 }

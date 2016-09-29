@@ -43,7 +43,24 @@ public class UserInfoController {
 		logger.debug("[GET_USER_INFO] dwID#"+dwID);
 		return userService.getUserInfo(dwID);
 	}
-	
+
+	@RequestMapping("/info/wealth")
+	@ResponseBody
+	public ResultBean getUserWealth(@RequestParam String dwID){
+		logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
+		return userService.getUserInfo(dwID);
+	}
+
+
+	@RequestMapping("/info/pay_password/token")
+	@ResponseBody
+	@Cacheable(value="userInfo",key="#dwID")
+	public ResultBean preSetPayPassword(@RequestParam String dwID,@RequestParam String password){
+		logger.debug("[GET_USER_INFO] dwID#"+dwID);
+		return userService.getUserInfo(dwID);
+	}
+
+
 	@RequestMapping("/bind/phone")
 	@ResponseBody
 	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code){
@@ -91,7 +108,7 @@ public class UserInfoController {
 
 		}catch (Exception e){
 			bean=ResultBean.FAIL("格式错误");
-			logger.debug("[ERROR_JSON] info#"+info);
+			logger.debug("[ERROR_JSON] info#"+info,e);
 			return  bean;
 		}
 	}

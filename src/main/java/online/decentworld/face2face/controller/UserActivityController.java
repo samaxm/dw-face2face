@@ -1,10 +1,12 @@
 package online.decentworld.face2face.controller;
 
+import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.common.AccountType;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.user.IUserActivityService;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.IPHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by Sammax on 2016/9/21.
@@ -25,6 +29,7 @@ public class UserActivityController {
     private IAppService appService;
     @Autowired
     private IUserActivityService userActivityService;
+
     private static Logger logger= LoggerFactory.getLogger(UserActivityController.class);
 
     @RequestMapping("/login")
@@ -39,6 +44,18 @@ public class UserActivityController {
         }
     }
 
+    @RequestMapping("/recharge")
+    @ResponseBody
+    public ResultBean recharge(HttpServletRequest request,@RequestParam String dwID,@RequestParam String channel,@RequestParam int amount,@RequestParam String payPassword){
+        try {
+            PayChannel payChannel=PayChannel.valueOf(channel);
+            String ip= IPHelper.getLocalIP(request);
+            return userActivityService.recharge(dwID,payChannel,amount,payPassword,ip);
+        }catch (IllegalArgumentException e){
+            logger.debug("[ERROR_PAY_CHANNEL] #"+channel);
+            return ResultBean.FAIL("不支持的支付方式");
+        }
+    }
 
     @RequestMapping("/reset/password")
     @ResponseBody

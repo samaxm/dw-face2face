@@ -1,9 +1,14 @@
 package online.decentworld.face2face.service.user.impl;
 
+import online.decentworld.charge.service.IOrderService;
+import online.decentworld.charge.service.OrderReceipt;
+import online.decentworld.charge.service.OrderType;
+import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.AccountType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.TokenType;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserActivityService;
 import online.decentworld.rdb.entity.User;
@@ -25,13 +30,19 @@ public class UserActivityService implements IUserActivityService {
     private ITokenCheckService tokenCheckService;
     @Autowired
     private EasemobApiUtil easemobApiUtil;
+    @Autowired
+    private IOrderService orderService;
+    @Autowired
+    private IUserAuthorityService authorityService;
+
+
     @Override
     public ResultBean login(String account, AccountType accountType, String password) {
         switch (accountType){
             case PHONENUM:
                 User user=userMapper.selectByPhoneNum(account);
                 if(user==null){
-                    ResultBean.FAIL("请注册后再登录！");
+                    return ResultBean.FAIL("请注册后再登录！");
                 }else if(user.getPassword().equals(AES.decode(password))){
                     return ObjectResultBean.SUCCESS(UserInfoService.UserFieldFilter(user));
                 }else{
@@ -40,6 +51,22 @@ public class UserActivityService implements IUserActivityService {
         }
         return ResultBean.FAIL("未支持该登录方式");
     }
+
+    @Override
+    public ResultBean recharge(String dwID, PayChannel channel, int amount, String password,String ip) {
+        if(authorityService.checkPayPassword(dwID,password)){
+            try {
+                OrderReceipt receipt=orderService.createOrder(channel, amount, dwID, OrderType.RECHARGE, null, ip);
+                return ObjectResultBean.SUCCESS(receipt.getRequestData());
+            } catch (Exception e) {
+                return ResultBean.FAIL("创建订单失败，请重试!");
+            }
+        }else{
+            return ResultBean.FAIL("支付密码错误!");
+        }
+
+    }
+
 
 
     @Override

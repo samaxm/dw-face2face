@@ -1,5 +1,5 @@
 package online.decentworld.face2face.common;
 
 public enum TokenType {
-	CHANGEPWD;
+	CHANGEPWD,SET_PAY_PASSWORD;
 }
