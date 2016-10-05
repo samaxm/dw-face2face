@@ -8,10 +8,7 @@ import online.decentworld.face2face.service.security.authority.impl.RDBUserAutho
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
-import online.decentworld.rdb.entity.PayPassword;
-import online.decentworld.rdb.entity.User;
-import online.decentworld.rdb.entity.UserInfo;
-import online.decentworld.rdb.entity.Wealth;
+import online.decentworld.rdb.entity.*;
 import online.decentworld.rdb.mapper.PayPasswordMapper;
 import online.decentworld.rdb.mapper.UserInfoMapper;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -70,13 +67,14 @@ public class UserInfoService implements IUserInfoService{
 			bean.setStatusCode(FAILED);
 			bean.setMsg("用户不存在");
 		}else{
-			Wealth w=wealthMapper.selectByPrimaryKey(dwID);
-			BaseDisplayUserInfo info=new BaseDisplayUserInfo(user,w.getWealth());
+			BaseDisplayUserInfo info=new BaseDisplayUserInfo(user);
 			bean.setStatusCode(SUCCESS);
 			bean.setData(info);
 		}
 		return bean;
 	}
+
+
 
 	@Override
 	public ResultBean updateUserInfo(User user) {
@@ -147,7 +145,6 @@ public class UserInfoService implements IUserInfoService{
 		user.setUnionid(null);
 		user.setType(null);
 		user.setVersion(null);
-		user.setWorth(null);
 		return user;
 	}
 }

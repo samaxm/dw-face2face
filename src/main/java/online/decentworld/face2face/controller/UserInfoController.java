@@ -37,8 +37,8 @@ public class UserInfoController {
 	private static Logger logger=LoggerFactory.getLogger(UserInfoController.class);
 
 	@RequestMapping("/info")
-	@ResponseBody
-	@Cacheable(value="userInfo",key="#dwID")
+		 @ResponseBody
+		 @Cacheable(value="userInfo",key="#dwID")
 	public ResultBean getUserInfo(@RequestParam String dwID){
 		logger.debug("[GET_USER_INFO] dwID#"+dwID);
 		return userService.getUserInfo(dwID);

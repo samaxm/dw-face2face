@@ -7,6 +7,7 @@ import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
 import online.decentworld.rdb.entity.LikeRecord;
+import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
@@ -119,9 +120,9 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 
 
 	@Override
-	public ListResultBean<LikeRecord> getLikeRecords(String dwID) {
-		ListResultBean<LikeRecord> list=new ListResultBean<LikeRecord>();
-		List<LikeRecord> records=likeMapper.getLikeRecords(dwID);
+	public ListResultBean<LikeRecordDetail> getLikeRecords(String dwID) {
+		ListResultBean<LikeRecordDetail> list=new ListResultBean<LikeRecordDetail>();
+		List<LikeRecordDetail> records=likeMapper.getLikeRecords(dwID);
 		list.setStatusCode(SUCCESS);
 		list.setData(records);
 		return list;

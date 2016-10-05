@@ -10,10 +10,6 @@ import online.decentworld.face2face.common.TokenType;
 public class WebCacheKey extends CacheKey {
 
 
-    public static String ONLINE_NUM="ONLINE";
-
-    public static String MAX_ONLINE="MAX_ONLINE";
-
     /**
      * 根据手机号码获取注册验证码
      * @return

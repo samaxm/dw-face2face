@@ -1,6 +1,9 @@
 package online.decentworld.face2face.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import online.decentworld.charge.ChargeService;
+import online.decentworld.charge.event.RechargeEvent;
 import online.decentworld.charge.service.alipay.AlipayNotify;
 import online.decentworld.charge.service.alipay.AlipayTradeStatus;
 import online.decentworld.charge.service.wx.WXConfig;
@@ -39,6 +42,8 @@ public class AppController {
 
 	@Autowired
 	private IAppService appService;
+	@Autowired
+	private ChargeService chargeService;
 	private static Logger logger= LoggerFactory.getLogger(AppController.class);
 
 	@RequestMapping("/check/version")
@@ -53,6 +58,12 @@ public class AppController {
 			bean.setMsg("类型错误");
 		}
 		return bean;
+	}
+
+	@RequestMapping("/online/users")
+	@ResponseBody
+	public ResultBean getOnlineUser(int page){
+		return appService.getOnlineUsers(page);
 	}
 
 
@@ -87,7 +98,8 @@ public class AppController {
 					String orderNum=map.get("out_trade_no");
 					int amount=Integer.parseInt(map.get("total_fee"));
 					//微信单位为分
-
+					String dwID= JSONObject.parseObject(map.get("attach")).getString("dwID");
+					chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
 					return WXConfig.SUCCESS;
 				}else{
 					logger.error("签名错误！ return_msg:"+map.get("return_msg"));
@@ -135,7 +147,7 @@ public class AppController {
 					logger.debug(" orderNum#"+orderNum+" dwID#"+dwID+" amount#"+amount+" params#"+ LogUtil.toLogString(params));
 					//				HashMap<String,String> extra=JSON.parseObject(attach, HashMap.class);
 					try {
-//						chargeService.checkAndUpdateOrder(orderNum, dwID, amount);
+						chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
 					} catch (Exception e) {
 						logger.error("",e);
 						return "fail";

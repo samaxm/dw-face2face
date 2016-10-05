@@ -57,7 +57,7 @@ public class PhoneCodeRegisterService implements IRegisterService{
                 easemobAPI.registerEasemobUser(id,password);
                 id=easemobAPI.registerEasemobUser(id,password);
                 user=new User(id,null,null,null,id,
-                        password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.toString());
+                        password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.toString(),true);
                 tryStoreUser(user);
                 Wealth w=new Wealth();
                 w.setDwid(id);

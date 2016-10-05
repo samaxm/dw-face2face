@@ -8,7 +8,9 @@ public interface IUserInfoService {
 	public ResultBean bindUserPhoneNum(String dwID,String phoneNum,String code);
 
 	public ObjectResultBean getUserInfo(String dwID);
-	
+
+
+
 	public ResultBean updateUserInfo(User user);
 
 	/**
