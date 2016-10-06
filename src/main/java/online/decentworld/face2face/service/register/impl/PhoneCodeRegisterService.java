@@ -1,6 +1,7 @@
 package online.decentworld.face2face.service.register.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.common.PhoneCodeType;
@@ -92,9 +93,13 @@ public class PhoneCodeRegisterService implements IRegisterService{
             try{
                 userMapper.insert(user);
                 break;
-            }catch(DuplicateKeyException e){
-                logger.info("[REPEAT_NAME]");
-                user.setName(user.getName()+attemp);
+            }catch(Exception e){
+                if(e instanceof MySQLIntegrityConstraintViolationException ||
+                        e instanceof DuplicateKeyException){
+                    logger.info("[REPEAT_NAME]");
+                    user.setName(user.getName()+attemp);
+                    user.setId(IDUtil.getDWID());
+                }
             }
             //.....不會這麼倒霉有20個重名的註冊吧
             if(attemp>20){

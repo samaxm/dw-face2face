@@ -84,7 +84,11 @@ public class AppService implements IAppService{
 		List<BaseDisplayUserInfo> list=sessionCache.getSessionInfos(page);
 		MapResultBean bean=new MapResultBean();
 		bean.getData().put("onlineNum",onlineNum);
-		bean.getData().put("userInfos",list);
+		if(list==null||list.isEmpty()){
+			bean.getData().put("userInfos",null);
+		}else {
+			bean.getData().put("userInfos", list);
+		}
 		return bean;
 	}
 

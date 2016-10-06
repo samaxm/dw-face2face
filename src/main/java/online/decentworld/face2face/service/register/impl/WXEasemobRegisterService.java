@@ -1,5 +1,6 @@
 package online.decentworld.face2face.service.register.impl;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.api.wx.WXInfo;
 import online.decentworld.face2face.api.wx.WeChatApiUtil;
@@ -54,7 +55,7 @@ public class WXEasemobRegisterService implements IRegisterService{
 				String id= IDUtil.getDWID();
 				id=easemobAPI.registerEasemobUser(id,password);
 				user=new User(id,info.getUnionid(),info.getOpenid(),info.getHeadimgurl(),info.getNickname(),
-						password,info.getCity(),CommonProperties.DEFAULT_WORTH,null,info.getSex(),null,0,UserType.UNCERTAIN.toString());
+						password,info.getCity(),CommonProperties.DEFAULT_WORTH,null,info.getSex(),null,0,UserType.UNCERTAIN.toString(),false);
 				tryStoreUser(user);
 				Wealth w=new Wealth();
 				w.setDwid(id);
@@ -91,9 +92,13 @@ public class WXEasemobRegisterService implements IRegisterService{
 			try{
 				userMapper.insert(user);
 				break;
-			}catch(DuplicateKeyException e){
-				logger.info("[REPEAT_NAME]");
-				user.setName(user.getName()+attemp);
+			}catch(Exception e){
+				if(e instanceof MySQLIntegrityConstraintViolationException ||
+						e instanceof DuplicateKeyException){
+					logger.info("[REPEAT_NAME]");
+					user.setName(user.getName()+attemp);
+					user.setId(IDUtil.getDWID());
+				}
 			}
 			//.....不會這麼倒霉有20個重名的註冊吧
 			if(attemp>20){
