@@ -5,6 +5,7 @@ import online.decentworld.charge.service.OrderType;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.face2face.config.ApplicationRootConfig;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.rdb.mapper.OrderMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,13 +21,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ServiceTest {
     @Autowired
     private OrderMapper mapper;
+    @Autowired
+    private IUserAuthorityService authorityService;
 
     @Test
     public void test() throws Exception {
-        OrderService orderService=new OrderService();
-        orderService.setOrderMapper(mapper);
-        OrderReceipt receipt= orderService.createOrder(PayChannel.WX, 1, "11", OrderType.RECHARGE, null, "112.74.13.117");
-        System.out.println(JSON.toJSONString(receipt.getRequestData()));
+        for(int i=0;i<5;i++){
+            System.out.println(authorityService.getUserKey("123"));
+        }
+
 
     }
 }

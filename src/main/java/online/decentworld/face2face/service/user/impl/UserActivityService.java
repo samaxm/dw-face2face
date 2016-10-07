@@ -1,15 +1,10 @@
 package online.decentworld.face2face.service.user.impl;
 
 import online.decentworld.cache.redis.SessionCache;
-import online.decentworld.charge.service.IOrderService;
-import online.decentworld.charge.service.OrderReceipt;
-import online.decentworld.charge.service.OrderType;
-import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.AccountType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.TokenType;
-import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserActivityService;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
@@ -32,10 +27,8 @@ public class UserActivityService implements IUserActivityService {
     private ITokenCheckService tokenCheckService;
     @Autowired
     private EasemobApiUtil easemobApiUtil;
-    @Autowired
-    private IOrderService orderService;
-    @Autowired
-    private IUserAuthorityService authorityService;
+
+
     @Autowired
     private SessionCache sessionCache;
 
@@ -65,23 +58,6 @@ public class UserActivityService implements IUserActivityService {
             return ResultBean.FAIL("密码错误");
         }
     }
-
-    @Override
-    public ResultBean recharge(String dwID, PayChannel channel, int amount, String password,String ip) {
-        if(authorityService.checkPayPassword(dwID,password)){
-            try {
-                OrderReceipt receipt=orderService.createOrder(channel, amount, dwID, OrderType.RECHARGE, null, ip);
-                return ObjectResultBean.SUCCESS(receipt.getRequestData());
-            } catch (Exception e) {
-                return ResultBean.FAIL("创建订单失败，请重试!");
-            }
-        }else{
-            return ResultBean.FAIL("支付密码错误!");
-        }
-
-    }
-
-
 
     @Override
     public ResultBean resetPassword(String phoneNum,String token, String password) throws Exception {

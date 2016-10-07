@@ -14,8 +14,7 @@ import redis.clients.jedis.Jedis;
 
 import static online.decentworld.cache.redis.ReturnResult.SUCCESS;
 import static online.decentworld.cache.redis.ReturnResult.result;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.REGISTER_CODE_EXPIRE;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.TOKEN_EXPIRE;
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.*;
 
 /**
  * 驗證碼相關緩存
@@ -97,7 +96,7 @@ public class SecurityCache extends RedisTemplate{
 	public void cacheAES(String dwID,String aes) throws Exception {
 		ReturnResult result=cache((Jedis jedis)->{
 			jedis=RedisClient.getJedis();
-			jedis.hset(CacheKey.AES,dwID,aes);
+			jedis.setex(CacheKey.AESKey(dwID), AES_EXPIRE, aes);
 			return ReturnResult.SUCCESS;
 		});
 		if(!result.isSuccess()){
@@ -108,7 +107,7 @@ public class SecurityCache extends RedisTemplate{
 	public String getAES(String dwID){
 		ReturnResult result=cache((Jedis jedis)->{
 			jedis=RedisClient.getJedis();
-			String key=jedis.hget(CacheKey.AES,dwID);
+			String key=jedis.get(CacheKey.AESKey(dwID));
 			return ReturnResult.result(key);
 		});
 		if(result.isSuccess()){

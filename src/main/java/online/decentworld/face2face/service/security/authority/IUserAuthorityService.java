@@ -9,4 +9,5 @@ public interface IUserAuthorityService {
 	public ObjectResultBean getRSAKey();
 	public ResultBean uploadKey(String dwID,String password,String key);
 	public String getUserKey(String dwID);
+	public boolean checkToken(String dwID,String token);
 }

@@ -4,15 +4,17 @@ import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.TokenType;
-import online.decentworld.face2face.service.security.authority.impl.RDBUserAuthorityService;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
-import online.decentworld.rdb.entity.*;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.entity.PayPassword;
+import online.decentworld.rdb.entity.User;
+import online.decentworld.rdb.entity.UserInfo;
 import online.decentworld.rdb.mapper.PayPasswordMapper;
 import online.decentworld.rdb.mapper.UserInfoMapper;
 import online.decentworld.rdb.mapper.UserMapper;
-import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.AES;
@@ -34,9 +36,7 @@ public class UserInfoService implements IUserInfoService{
 	@Autowired
 	private ITokenCheckService tokenService;
 	@Autowired
-	private WealthMapper wealthMapper;
-	@Autowired
-	private RDBUserAuthorityService authorityService;
+	private IUserAuthorityService authorityService;
 	@Autowired
 	private PayPasswordMapper payPasswordMapper;
 	
@@ -126,17 +126,7 @@ public class UserInfoService implements IUserInfoService{
 		}
 	}
 
-	@Override
-	public ResultBean getUserWealth(String dwID) {
-		String key=authorityService.getUserKey(dwID);
-		dwID=AES.decode(dwID,key);
-		if(dwID.length()==10){
-			Wealth wealth=wealthMapper.selectByPrimaryKey(dwID);
-			if(wealth!=null)
-				return ObjectResultBean.SUCCESS(wealth.getWealth());
-		}
-		return ResultBean.FAIL("用户ID错误");
-	}
+
 
 
 	public static User UserFieldFilter(User user){

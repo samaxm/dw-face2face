@@ -81,8 +81,8 @@ public class SecurityController {
 
 	@RequestMapping(value="/key/upload")
 	@ResponseBody
-	public ResultBean uploadAES(@RequestParam String dwID,@RequestParam String key) throws IOException{
-		return authorityService.getRSAKey();
+	public ResultBean uploadAES(@RequestParam String dwID,@RequestParam String password,@RequestParam String key) throws IOException{
+		return authorityService.uploadKey(dwID,password,key);
 	}
 
 	@RequestMapping("/forget/password")

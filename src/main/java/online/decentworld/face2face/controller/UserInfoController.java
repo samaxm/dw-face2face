@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import static online.decentworld.face2face.config.ConfigLoader.DomainConfig.FDFS
 
 @RequestMapping("/user")
 @Controller
+@CacheConfig(cacheResolver = "default_cache_resolver")
 public class UserInfoController {
 
 	@Autowired
@@ -37,27 +39,18 @@ public class UserInfoController {
 	private static Logger logger=LoggerFactory.getLogger(UserInfoController.class);
 
 	@RequestMapping("/info")
-		 @ResponseBody
-		 @Cacheable(value="userInfo",key="#dwID")
+	@ResponseBody
+	@Cacheable(cacheNames ="redis_user_info" ,key="#dwID")
 	public ResultBean getUserInfo(@RequestParam String dwID){
 		logger.debug("[GET_USER_INFO] dwID#"+dwID);
 		return userService.getUserInfo(dwID);
 	}
 
-	@RequestMapping("/info/wealth")
-	@ResponseBody
-	public ResultBean getUserWealth(@RequestParam String dwID){
-		logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
-		return userService.getUserInfo(dwID);
-	}
-
-
 	@RequestMapping("/info/pay_password/token")
 	@ResponseBody
-	@Cacheable(value="userInfo",key="#dwID")
 	public ResultBean preSetPayPassword(@RequestParam String dwID,@RequestParam String password){
 		logger.debug("[GET_USER_INFO] dwID#"+dwID);
-		return userService.getUserInfo(dwID);
+		return userService.preSetUserPayPassword(dwID,password);
 	}
 
 

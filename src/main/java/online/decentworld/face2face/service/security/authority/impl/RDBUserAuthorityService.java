@@ -14,12 +14,15 @@ import online.decentworld.tools.RSA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 
 @Service
+@CacheConfig(cacheResolver = "default_cache_resolver")
 public class RDBUserAuthorityService implements IUserAuthorityService{
 
 	@Autowired
@@ -115,8 +118,24 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	}
 
 	@Override
+	@Cacheable(cacheNames = "local_aes_key",key = "#dwID")
 	public String getUserKey(String dwID) {
 		return securityCache.getAES(dwID);
 	}
+
+	@Override
+	public boolean checkToken(String dwID,String token) {
+		if(token.length()!=40){
+			return false;
+		}
+		String random=token.substring(0,8);
+		String secret=token.substring(8);
+		if(AES.encode(random,getUserKey(dwID)).equals(secret)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 
 }

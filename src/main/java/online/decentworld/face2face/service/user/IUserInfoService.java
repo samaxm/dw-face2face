@@ -29,5 +29,4 @@ public interface IUserInfoService {
 	public ResultBean setUserPayPassword(String dwID,String payPassword,String token);
 
 
-	public ResultBean getUserWealth(String dwID);
 }

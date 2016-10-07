@@ -123,6 +123,7 @@ public class ConfigLoader {
 		public static int BLOCK_TIME;
 		public static int CACHE_EXPIRE;
 		public static int TOKEN_EXPIRE;
+		public static int AES_EXPIRE;
 	}
 	
 	public static class AdminConfig{
