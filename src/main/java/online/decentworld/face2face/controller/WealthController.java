@@ -41,8 +41,12 @@ public class WealthController {
 
     @RequestMapping("")
     @ResponseBody
-    public ResultBean getUserWealth(@RequestParam String dwID,@RequestParam String token){
+    public ResultBean getUserWealth(HttpServletRequest request){
+        String dwID= (String) request.getAttribute("dwID");
+        if(dwID==null){
+            return ResultBean.FAIL("非法请求");
+        }
         logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
-        return wealthService.getUserWealth(dwID,token);
+        return wealthService.getUserWealth(dwID);
     }
 }

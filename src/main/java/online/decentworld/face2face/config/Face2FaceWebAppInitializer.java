@@ -1,15 +1,15 @@
 package online.decentworld.face2face.config;
 
-import static online.decentworld.face2face.tools.WebLogUtil.toLogString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletRegistration.Dynamic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.filter.CharacterEncodingFilter;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import static online.decentworld.face2face.tools.WebLogUtil.toLogString;
 /**
  * servlet config 
  * 
@@ -19,7 +19,10 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
 public class Face2FaceWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer{
 
 	private static Logger logger=LoggerFactory.getLogger(Face2FaceWebAppInitializer.class);
-	
+
+
+
+
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
 		Class<?>[] rootConfig={ApplicationRootConfig.class};

@@ -19,6 +19,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 @Service
@@ -41,8 +43,10 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 		StringBuffer sb = new StringBuffer();
 		StringBuffer sb2 = new StringBuffer();
 		try {
-			InputStream in = RDBUserAuthorityService.class.getClassLoader().getResourceAsStream(ConfigLoader.AdminConfig.RSA_PUBLIC);
-			InputStream in2 = RDBUserAuthorityService.class.getClassLoader().getResourceAsStream(ConfigLoader.AdminConfig.RSA_PRIVATE);
+			File rsa_public=new File(ConfigLoader.AdminConfig.RSA_PUBLIC);
+			File rsa_private=new File(ConfigLoader.AdminConfig.RSA_PRIVATE);
+			InputStream in = new FileInputStream(rsa_public);
+			InputStream in2 =new FileInputStream(rsa_private);
 			int c;
 			while ((c = in.read()) != -1) {
 				sb.append((char) c);

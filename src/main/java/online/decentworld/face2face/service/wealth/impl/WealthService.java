@@ -26,16 +26,12 @@ public class WealthService implements IWealthService {
     private WealthMapper wealthMapper;
 
     @Override
-    public ResultBean getUserWealth(String dwID,String token) {
-        if(authorityService.checkToken(dwID,token)){
-            Wealth wealth=wealthMapper.selectByPrimaryKey(dwID);
-            if(wealth!=null)
-                return ObjectResultBean.SUCCESS(wealth.getWealth());
-            else
-                return ResultBean.FAIL("用户ID不存在");
-        }else {
-            return ResultBean.FAIL("非法请求");
-        }
+    public ResultBean getUserWealth(String dwID) {
+        Wealth wealth=wealthMapper.selectByPrimaryKey(dwID);
+        if(wealth!=null)
+            return ObjectResultBean.SUCCESS(wealth.getWealth());
+        else
+            return ResultBean.FAIL("用户ID不存在");
 
     }
 

@@ -10,6 +10,6 @@ public interface IWealthService {
 
     ResultBean recharge(String dwID,PayChannel channel,int amount,String ip);
 
-    ResultBean getUserWealth(String dwID,String token);
+    ResultBean getUserWealth(String dwID);
 
 }

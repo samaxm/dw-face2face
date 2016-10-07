@@ -1,5 +1,6 @@
 package online.decentworld.face2face.config;
 
+import online.decentworld.tools.EnvironmentCofing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,9 +132,13 @@ public class ConfigLoader {
 			Properties expirePro=new Properties();
 			try {
 				expirePro.load(AdminConfig.class.getClassLoader().getResourceAsStream(AMIN_CONFIG_FILE));
-				for(String property:expirePro.stringPropertyNames()){
-					AdminConfig.class.getField(property).set(null, expirePro.getProperty(property));					
-				}	
+				for(Field field:AdminConfig.class.getFields()){
+					String key=field.getName();
+					if(field.getName().startsWith("RSA")){
+						key= EnvironmentCofing.environment.name().toUpperCase()+"_"+field.getName();
+					}
+					field.set(null,expirePro.getProperty(key));
+				}
 				checkNull(AdminConfig.class);
 			} catch (Exception e) {
 				logger.error("[LOAD_CONFIG_FAILED]",e);

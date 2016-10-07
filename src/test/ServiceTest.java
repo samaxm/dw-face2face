@@ -5,6 +5,7 @@ import online.decentworld.charge.service.OrderType;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.face2face.config.ApplicationRootConfig;
+import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.rdb.mapper.OrderMapper;
 import org.junit.Test;
@@ -26,9 +27,7 @@ public class ServiceTest {
 
     @Test
     public void test() throws Exception {
-        for(int i=0;i<5;i++){
-            System.out.println(authorityService.getUserKey("123"));
-        }
+        System.out.println(ConfigLoader.AdminConfig.RSA_PRIVATE);
 
 
     }

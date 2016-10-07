@@ -18,12 +18,14 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,7 +41,9 @@ import java.util.List;
 @ComponentScan(basePackages={"online.decentworld.face2face.controller"})
 public class ServletConfig extends WebMvcConfigurerAdapter{
 
-	
+	@Resource(name = "checkTokenInterceptor")
+	private HandlerInterceptor checkTokenInterceptor;
+
 	@Bean
 	public ViewResolver viewResolver(){
 		InternalResourceViewResolver resolver=new InternalResourceViewResolver();
@@ -90,6 +94,7 @@ public class ServletConfig extends WebMvcConfigurerAdapter{
 	public void addInterceptors(InterceptorRegistry registry) {
 		super.addInterceptors(registry);
 		registry.addInterceptor(new LocalRequestLimit());
+		registry.addInterceptor(checkTokenInterceptor);
 	}
 	
 	@Override
