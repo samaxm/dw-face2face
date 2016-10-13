@@ -5,7 +5,9 @@ import online.decentworld.face2face.common.FileSubfix;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.AES;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -14,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,16 +41,18 @@ public class UserInfoController {
 
 	@RequestMapping("/info")
 	@ResponseBody
-	@Cacheable(cacheNames ="redis_user_info" ,key="#dwID")
 	public ResultBean getUserInfo(@RequestParam String dwID){
-		logger.debug("[GET_USER_INFO] dwID#"+dwID);
-		return userService.getUserInfo(dwID);
+		BaseDisplayUserInfo info= userService.getUserInfo(dwID);
+		if(info==null){
+			return ResultBean.FAIL("用户不存在");
+		}else{
+			return ObjectResultBean.SUCCESS(info);
+		}
 	}
 
 	@RequestMapping("/info/pay_password/token")
 	@ResponseBody
 	public ResultBean preSetPayPassword(@RequestParam String dwID,@RequestParam String password){
-		logger.debug("[GET_USER_INFO] dwID#"+dwID);
 		return userService.preSetUserPayPassword(dwID,password);
 	}
 

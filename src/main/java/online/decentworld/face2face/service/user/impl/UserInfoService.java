@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import static online.decentworld.face2face.common.StatusCode.FAILED;
 import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 @Service
 public class UserInfoService implements IUserInfoService{
@@ -60,18 +59,13 @@ public class UserInfoService implements IUserInfoService{
 	}
 
 	@Override
-	public ObjectResultBean getUserInfo(String dwID) {
-		ObjectResultBean bean=new ObjectResultBean();
+	public BaseDisplayUserInfo getUserInfo(String dwID) {
 		User user=userMapper.selectByPrimaryKey(dwID);
 		if(user==null){
-			bean.setStatusCode(FAILED);
-			bean.setMsg("用户不存在");
+			return null;
 		}else{
-			BaseDisplayUserInfo info=new BaseDisplayUserInfo(user);
-			bean.setStatusCode(SUCCESS);
-			bean.setData(info);
+			return new BaseDisplayUserInfo(user);
 		}
-		return bean;
 	}
 
 

@@ -6,13 +6,19 @@ import online.decentworld.face2face.cache.MatchQueueCache;
 import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
+import online.decentworld.face2face.service.user.IUserInfoService;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.rpc.dto.message.MessageWrapperFactory;
+import online.decentworld.rpc.transfer.Sender;
 import online.decentworld.tools.RandomUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -37,7 +43,13 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	private IReportService reportService;
 	@Autowired
 	private LikeRecordMapper likeMapper;
+	@Autowired
+	private Sender sender;
+	@Autowired
+	private IUserInfoService infoService;
 
+
+	private static Logger logger= LoggerFactory.getLogger(UserDefaultMatcherService.class);
 
 	/**
 	 * 匹配等待队列数量，数量关系到了用户断线后重复遇到的几率以及用户等待的时间，该数值应当和当前在线人数相关，可弹性变化
@@ -112,7 +124,13 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		LikeRecord record=new LikeRecord(dwID,likedID);
 		try{
 			likeMapper.insertSelective(record);
+			//send push message
+			BaseDisplayUserInfo info=infoService.getUserInfo(dwID);
+			if(info!=null)
+				sender.send(MessageWrapperFactory.createLikeMessage(dwID,likedID,info.getName(),info.getIcon(),String.valueOf(info.getSex())),likedID);
 		}catch(DuplicateKeyException ex){
+		} catch (Exception e) {
+			logger.warn("[SEND_MQ_FAILED] LIKE_MESSAGE dwID#"+dwID+" likedID#"+likedID,e);
 		}
 		return ResultBean.SUCCESS;
 	}

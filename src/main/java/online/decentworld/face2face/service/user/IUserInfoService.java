@@ -1,14 +1,14 @@
 package online.decentworld.face2face.service.user;
 
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
-import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import org.springframework.cache.annotation.Cacheable;
 
 public interface IUserInfoService {
 	public ResultBean bindUserPhoneNum(String dwID,String phoneNum,String code);
-
-	public ObjectResultBean getUserInfo(String dwID);
-
+	@Cacheable(cacheNames ="redis_user_info" ,key="#dwID")
+	public BaseDisplayUserInfo getUserInfo(String dwID);
 
 
 	public ResultBean updateUserInfo(User user);

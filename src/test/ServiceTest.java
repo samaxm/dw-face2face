@@ -27,7 +27,7 @@ public class ServiceTest {
 
     @Test
     public void test() throws Exception {
-        System.out.println(ConfigLoader.AdminConfig.RSA_PRIVATE);
+//        System.out.println(ConfigLoader.AdminConfig.RSA_PRIVATE);
 
 
     }
