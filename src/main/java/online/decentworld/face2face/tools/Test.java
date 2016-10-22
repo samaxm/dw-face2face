@@ -9,7 +9,6 @@ public class Test {
 
     public static void main(String[] args) throws InterruptedException {
         new Thread() {
-
             @Override
             public void run() {
                 for (;;) {

@@ -7,15 +7,13 @@ import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
 import online.decentworld.face2face.service.user.IUserInfoService;
-import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-import online.decentworld.rpc.dto.message.MessageWrapperFactory;
-import online.decentworld.rpc.transfer.Sender;
 import online.decentworld.tools.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +41,6 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	private IReportService reportService;
 	@Autowired
 	private LikeRecordMapper likeMapper;
-	@Autowired
-	private Sender sender;
 	@Autowired
 	private IUserInfoService infoService;
 
@@ -94,6 +90,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon, boolean isPrioritized) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
+
 			bean.setStatusCode(FAILED);
 			bean.setMsg("抱歉，您被举报次数过多已被封号");
 		}else{
@@ -108,7 +105,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 					matchUserInfo= matchCache.getMatchUser(info, index);
 				}
 				if(matchUserInfo==null){
-					return  ResultBean.FAIL("搜索用户中...");
+					return ObjectResultBean.FAIL("搜索用户中...");
 				}
 				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
 			}while (matched.getDwID().equals(dwID));
@@ -124,10 +121,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		LikeRecord record=new LikeRecord(dwID,likedID);
 		try{
 			likeMapper.insertSelective(record);
-			//send push message
-			BaseDisplayUserInfo info=infoService.getUserInfo(dwID);
-			if(info!=null)
-				sender.send(MessageWrapperFactory.createLikeMessage(dwID,likedID,info.getName(),info.getIcon(),String.valueOf(info.getSex())),likedID);
+
 		}catch(DuplicateKeyException ex){
 		} catch (Exception e) {
 			logger.warn("[SEND_MQ_FAILED] LIKE_MESSAGE dwID#"+dwID+" likedID#"+likedID,e);

@@ -22,11 +22,14 @@ import online.decentworld.tools.IDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 @Service
+@CacheConfig(cacheResolver = "default_cache_resolver")
 public class UserInfoService implements IUserInfoService{
 	@Autowired
 	private UserInfoMapper userInfoMapper;
@@ -59,6 +62,7 @@ public class UserInfoService implements IUserInfoService{
 	}
 
 	@Override
+	@Cacheable(cacheNames ="redis_user_info" ,key="#dwID")
 	public BaseDisplayUserInfo getUserInfo(String dwID) {
 		User user=userMapper.selectByPrimaryKey(dwID);
 		if(user==null){

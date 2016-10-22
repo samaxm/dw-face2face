@@ -101,10 +101,6 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
             logger.debug("[BAD_FIELD] getName#"+user.getName());
             return false;
 
-        }else if(user.getSex()==null||(user.getSex()!=1&&user.getSex()!=2)){
-            logger.debug("[BAD_FIELD] getSex#"+user.getSex());
-            return false;
-
         }else if(user.getWorth()==null){
             logger.debug("[BAD_FIELD] getWorth#"+user.getWorth());
             return false;

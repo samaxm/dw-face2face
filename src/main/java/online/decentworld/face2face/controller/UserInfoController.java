@@ -15,7 +15,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +31,6 @@ import static online.decentworld.face2face.config.ConfigLoader.DomainConfig.FDFS
 
 @RequestMapping("/user")
 @Controller
-@CacheConfig(cacheResolver = "default_cache_resolver")
 public class UserInfoController {
 
 	@Autowired
@@ -60,7 +58,6 @@ public class UserInfoController {
 	@RequestMapping("/bind/phone")
 	@ResponseBody
 	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code){
-		
 		return userService.bindUserPhoneNum(dwID, phoneNum, code);
 	}
 

@@ -7,6 +7,7 @@ import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.face2face.config.ApplicationRootConfig;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
+import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rdb.mapper.OrderMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +25,12 @@ public class ServiceTest {
     private OrderMapper mapper;
     @Autowired
     private IUserAuthorityService authorityService;
-
+    @Autowired
+    private LikeRecordMapper recordMapper;
     @Test
     public void test() throws Exception {
 //        System.out.println(ConfigLoader.AdminConfig.RSA_PRIVATE);
-
+        System.out.println(JSON.toJSONString(recordMapper.getLikeRecords("2419918324")));
 
     }
 }

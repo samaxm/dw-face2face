@@ -23,8 +23,6 @@ public class MatchController {
 	@Autowired
 	private IUserMatcherService matchService;
 
-
-
 	@Frequency(limit=15,time=15000)
 	@RequestMapping("/getMatch")
 	@ResponseBody
@@ -37,7 +35,6 @@ public class MatchController {
 	public ResultBean like(@RequestParam String dwID,@RequestParam String likedID){
 		return matchService.likeUser(dwID,likedID);
 	}
-
 
 	@RequestMapping("/like/records")
 	@ResponseBody

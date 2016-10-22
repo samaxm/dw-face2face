@@ -2,6 +2,8 @@ package online.decentworld.face2face.service.security.request.impl;
 
 import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.service.security.request.RequestLimit;
+import online.decentworld.tools.Environment;
+import online.decentworld.tools.EnvironmentCofing;
 import online.decentworld.tools.IPHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,9 @@ public class LocalRequestLimit extends HandlerInterceptorAdapter implements Requ
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
+		if(EnvironmentCofing.environment== Environment.LOCAL){
+			return true;
+		}
 		Frequency mf=((HandlerMethod)handler).getMethodAnnotation(Frequency.class);
 		if(mf==null){
 			return true;

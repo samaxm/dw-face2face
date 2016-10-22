@@ -79,7 +79,7 @@ public class WealthController {
     @RequestMapping("/response/wx")
     @ResponseBody
     public String getWXRechargeResponse(HttpServletRequest request,HttpServletResponse response){
-
+        logger.info("[GET_WX_RESPONSE]");
         Map<String, String> map = new HashMap<>();
         InputStream inputStream = null;
         try {
@@ -128,7 +128,7 @@ public class WealthController {
     @ResponseBody
     public String getOrderResponse(HttpServletRequest request,HttpServletResponse response){
 
-        logger.info("getOrderResponse-------------->begin");
+        logger.info("[GET_ALIPAY_RESPONSE]");
         try{
             Map<String,String> params=new HashMap<String, String>();
             Enumeration<String> parameterNames=request.getParameterNames();
@@ -138,7 +138,7 @@ public class WealthController {
                 params.put(name, value);
             }
             AlipayTradeStatus status=AlipayTradeStatus.valueOf(request.getParameter("trade_status"));
-            logger.debug("【ORDER_RESPONSE_STATUS】  trade_status#"+status);
+            logger.debug("[ORDER_RESPONSE_STATUS]  trade_status#"+status);
             if(status==AlipayTradeStatus.TRADE_SUCCESS){
                 boolean verify= AlipayNotify.verify(params);
                 if(verify){

@@ -56,7 +56,8 @@ public class Face2FaceWebAppInitializer extends AbstractAnnotationConfigDispatch
 	
 	@Override
 	protected void customizeRegistration(Dynamic registration) {
-		registration.setMultipartConfig(new MultipartConfigElement("f:/temp",2097152,4194304,0));
+//		registration.setMultipartConfig(new MultipartConfigElement("/tmp/webapp",2097152,4194304,0));
+		registration.setMultipartConfig(new MultipartConfigElement("/tmp/webapp",2097152,4194304,0));
 		registration.setLoadOnStartup(0);
 	}
 	
