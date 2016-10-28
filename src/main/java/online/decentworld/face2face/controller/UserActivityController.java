@@ -63,7 +63,7 @@ public class UserActivityController {
 
     @RequestMapping("/ping")
     @ResponseBody
-    @Frequency(time=5*60*1000,limit =2)
+    @Frequency(time=5*60*1000,limit =20)
     public ResultBean markOnline(String dwID,String info){
         return appService.markOnline(dwID);
     }

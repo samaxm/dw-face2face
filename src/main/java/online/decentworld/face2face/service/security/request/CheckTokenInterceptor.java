@@ -1,5 +1,6 @@
 package online.decentworld.face2face.service.security.request;
 
+import online.decentworld.face2face.common.AttributeKey;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +46,15 @@ public class CheckTokenInterceptor extends HandlerInterceptorAdapter {
                 String dwID=request.getParameter("dwID");
                 String token=request.getParameter("token");
                 if(dwID==null||token==null){
-                    return false;
-                }
-                if(authorityService.checkToken(dwID,token)){
-                    request.setAttribute("dwID",dwID);
-                }else{
-                    logger.debug("[TOKEN_CHECK_FAIL]");
-                    return false;
+                    request.setAttribute(AttributeKey.isValidate,false);
+                }else {
+//                    if (authorityService.checkToken(dwID, token)) {
+                        request.setAttribute(AttributeKey.dwID, dwID);
+                        request.setAttribute(AttributeKey.isValidate, true);
+//                    } else {
+//                        logger.debug("[TOKEN_CHECK_FAIL]");
+//                        request.setAttribute(AttributeKey.isValidate, false);
+//                    }
                 }
             }
             return true;

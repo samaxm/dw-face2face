@@ -23,7 +23,7 @@ public class MatchController {
 	@Autowired
 	private IUserMatcherService matchService;
 
-	@Frequency(limit=15,time=15000)
+	@Frequency(limit=150,time=15000)
 	@RequestMapping("/getMatch")
 	@ResponseBody
 	public ResultBean getMatchUser(@RequestParam String dwID,@RequestParam String name,String icon,HttpServletRequest request){
@@ -42,7 +42,7 @@ public class MatchController {
 		return matchService.getLikeRecords(dwID);
 	}
 
-	@Frequency(limit=15,time=15000)
+	@Frequency(limit=150,time=15000)
 	@RequestMapping("/getMatch/v2")
 	@ResponseBody
 	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){

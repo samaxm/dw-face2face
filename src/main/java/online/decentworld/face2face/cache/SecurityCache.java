@@ -1,7 +1,6 @@
 package online.decentworld.face2face.cache;
 
 import online.decentworld.cache.redis.CacheKey;
-import online.decentworld.cache.redis.RedisClient;
 import online.decentworld.cache.redis.RedisTemplate;
 import online.decentworld.cache.redis.ReturnResult;
 import online.decentworld.face2face.common.PhoneCodeType;
@@ -14,7 +13,8 @@ import redis.clients.jedis.Jedis;
 
 import static online.decentworld.cache.redis.ReturnResult.SUCCESS;
 import static online.decentworld.cache.redis.ReturnResult.result;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.*;
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.REGISTER_CODE_EXPIRE;
+import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.TOKEN_EXPIRE;
 
 /**
  * 驗證碼相關緩存
@@ -33,7 +33,6 @@ public class SecurityCache extends RedisTemplate{
 	 */
 	public void cachePhoneCode(String phoneNum,String code,PhoneCodeType type) throws CachePhoneCodeFailed{
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis= RedisClient.getJedis();
 			jedis.setex(WebCacheKey.PHONECODE_KEY(phoneNum,type), REGISTER_CODE_EXPIRE, code);
 			return SUCCESS;
 		});
@@ -47,7 +46,6 @@ public class SecurityCache extends RedisTemplate{
 	 */
 	public String getPhoneCodeCache(String phoneNum,PhoneCodeType type){
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
 			String key=WebCacheKey.PHONECODE_KEY(phoneNum,type);
 			String code=jedis.get(key);
 			return result(code);
@@ -63,7 +61,6 @@ public class SecurityCache extends RedisTemplate{
 	 */
 	public int incrReportNum(String reportedID){
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
 			return result(jedis.hincrBy(CacheKey.REPORT_TABLE,reportedID,1).intValue());
 		});
 		if(result.isSuccess()){
@@ -77,7 +74,6 @@ public class SecurityCache extends RedisTemplate{
 	
 	public void cacheToken(String key,TokenType type,String token){
 		cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
 			jedis.setex(WebCacheKey.TOKEN_KEY(key,type),TOKEN_EXPIRE,token);
 			return SUCCESS;
 		});
@@ -85,7 +81,6 @@ public class SecurityCache extends RedisTemplate{
 	
 	public String getToken(String key,TokenType type){
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
 			String redisKey=WebCacheKey.TOKEN_KEY(key, type);
 			String code=jedis.get(redisKey);
 			return result(code);
@@ -95,8 +90,7 @@ public class SecurityCache extends RedisTemplate{
 
 	public void cacheAES(String dwID,String aes) throws Exception {
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
-			jedis.setex(CacheKey.AESKey(dwID), AES_EXPIRE, aes);
+			jedis.set(CacheKey.AESKey(dwID),aes);
 			return ReturnResult.SUCCESS;
 		});
 		if(!result.isSuccess()){
@@ -106,7 +100,6 @@ public class SecurityCache extends RedisTemplate{
 
 	public String getAES(String dwID){
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis=RedisClient.getJedis();
 			String key=jedis.get(CacheKey.AESKey(dwID));
 			return ReturnResult.result(key);
 		});

@@ -1,9 +1,9 @@
 package online.decentworld.face2face.controller;
 
-import online.decentworld.charge.ChargeService;
 import online.decentworld.face2face.common.AppType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +41,13 @@ public class AppController {
 	@ResponseBody
 	public ResultBean getOnlineUser(int page){
 		return appService.getOnlineUsers(page);
+	}
+
+
+	@RequestMapping("/iphone/status")
+	@ResponseBody
+	public ResultBean isIphoneInChek(){
+		return ObjectResultBean.SUCCESS(true);
 	}
 
 

@@ -2,7 +2,6 @@ package online.decentworld.face2face.service.user.impl;
 
 import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.common.PhoneCodeType;
-import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
@@ -13,7 +12,6 @@ import online.decentworld.rdb.entity.PayPassword;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.UserInfo;
 import online.decentworld.rdb.mapper.PayPasswordMapper;
-import online.decentworld.rdb.mapper.UserInfoMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -26,13 +24,10 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-
-import static online.decentworld.face2face.common.StatusCode.SUCCESS;
 @Service
 @CacheConfig(cacheResolver = "default_cache_resolver")
 public class UserInfoService implements IUserInfoService{
-	@Autowired
-	private UserInfoMapper userInfoMapper;
+
 	@Autowired
 	private UserMapper userMapper;
 	@Autowired
@@ -46,24 +41,28 @@ public class UserInfoService implements IUserInfoService{
 
 	@Override
 	public ResultBean bindUserPhoneNum(String dwID, String phoneNum,String code) {
-		ResultBean bean=new ResultBean();
+
 		if(!tokenService.checkPhoneCode(phoneNum, PhoneCodeType.BIND, code)){
-			bean.setStatusCode(StatusCode.FAILED);
-			bean.setMsg("驗證碼錯誤！");
+			return ObjectResultBean.FAIL("验证码错误");
 		}else{
 			UserInfo info=new UserInfo();
 			info.setDwid(dwID);
 			info.setPhonenum(phoneNum);
-			userInfoMapper.updateByPrimaryKeySelective(info);
-			bean.setStatusCode(SUCCESS);
+			try {
+				userMapper.bindPhoneNum(phoneNum, dwID);
+			}catch (DuplicateKeyException e){
+				return ObjectResultBean.FAIL("该手机号码已被绑定");
+			}
+			String token=IDUtil.randomToken();
+			tokenService.cacheToken(token,phoneNum,TokenType.CHANGEPWD);
+			return ObjectResultBean.SUCCESS(token);
 		}
-		return bean;
-
 	}
 
 	@Override
-	@Cacheable(cacheNames ="redis_user_info" ,key="#dwID")
+	@Cacheable(value="redis_online.decentworld.rdb.entity.BaseDisplayUserInfo" ,key="#dwID")
 	public BaseDisplayUserInfo getUserInfo(String dwID) {
+		System.out.println("invoke");
 		User user=userMapper.selectByPrimaryKey(dwID);
 		if(user==null){
 			return null;

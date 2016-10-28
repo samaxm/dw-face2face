@@ -1,14 +1,7 @@
-import com.alibaba.fastjson.JSON;
-import online.decentworld.charge.service.IOrderService;
-import online.decentworld.charge.service.OrderReceipt;
-import online.decentworld.charge.service.OrderType;
-import online.decentworld.charge.service.PayChannel;
-import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.face2face.config.ApplicationRootConfig;
-import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
-import online.decentworld.rdb.mapper.LikeRecordMapper;
-import online.decentworld.rdb.mapper.OrderMapper;
+import online.decentworld.face2face.service.user.IUserInfoService;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +14,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={ApplicationRootConfig.class})
 public class ServiceTest {
-    @Autowired
-    private OrderMapper mapper;
+
     @Autowired
     private IUserAuthorityService authorityService;
     @Autowired
-    private LikeRecordMapper recordMapper;
+    private IUserInfoService userInfoService;
+
     @Test
     public void test() throws Exception {
 //        System.out.println(ConfigLoader.AdminConfig.RSA_PRIVATE);
-        System.out.println(JSON.toJSONString(recordMapper.getLikeRecords("2419918324")));
-
+        for(int i=0;i<10;i++){
+            BaseDisplayUserInfo info=userInfoService.getUserInfo("9344031574");
+//            authorityService.getUserKey("123");
+        }
     }
 }

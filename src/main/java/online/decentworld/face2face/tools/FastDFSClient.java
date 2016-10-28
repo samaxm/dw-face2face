@@ -119,7 +119,11 @@ public class FastDFSClient implements FileManagerConfig{
 	}
 
 	public static void deleteByFullName(String url){
-		String sub=url.substring(url.indexOf("group"));
+		int index=url.indexOf("group");
+		if(index==-1){
+			return;
+		}
+		String sub=url.substring(index);
 		try {
 			String group=sub.substring(0,sub.indexOf("/"));
 			String file=sub.substring(sub.indexOf("/") + 1);

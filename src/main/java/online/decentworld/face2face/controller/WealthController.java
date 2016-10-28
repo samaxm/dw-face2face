@@ -1,7 +1,6 @@
 package online.decentworld.face2face.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import online.decentworld.charge.ChargeService;
 import online.decentworld.charge.event.RechargeEvent;
 import online.decentworld.charge.service.PayChannel;
@@ -10,7 +9,9 @@ import online.decentworld.charge.service.alipay.AlipayTradeStatus;
 import online.decentworld.charge.service.wx.WXConfig;
 import online.decentworld.charge.service.wx.WXPayResponseStatus;
 import online.decentworld.charge.service.wx.WXSignUtil;
+import online.decentworld.face2face.common.AttributeKey;
 import online.decentworld.face2face.service.wealth.IWealthService;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.IPHelper;
 import online.decentworld.tools.LogUtil;
@@ -67,10 +68,12 @@ public class WealthController {
     @RequestMapping("")
     @ResponseBody
     public ResultBean getUserWealth(HttpServletRequest request){
-        String dwID= (String) request.getAttribute("dwID");
-        if(dwID==null){
-            return ResultBean.FAIL("非法请求");
+
+        Boolean isValidate= (Boolean) request.getAttribute(AttributeKey.isValidate);
+        if(isValidate==null||!isValidate){
+            return ObjectResultBean.FAIL("invalidate key");
         }
+        String dwID= (String) request.getAttribute("dwID");
         logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
         return wealthService.getUserWealth(dwID);
     }
@@ -100,8 +103,8 @@ public class WealthController {
                     String orderNum=map.get("out_trade_no");
                     int amount=Integer.parseInt(map.get("total_fee"));
                     //微信单位为分
-                    String dwID= JSONObject.parseObject(map.get("attach")).getString("dwID");
-                    chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
+                    String dwID= map.get("attach");
+                    chargeService.charge(new RechargeEvent(dwID, amount, orderNum));
                     return WXConfig.SUCCESS;
                 }else{
                     logger.error("签名错误！ return_msg:"+map.get("return_msg"));
@@ -147,7 +150,7 @@ public class WealthController {
                     //转成分
                     int amount= MoneyUnitConverter.fromYuantoFen(params.get("total_fee"));
                     logger.debug(" orderNum#"+orderNum+" dwID#"+dwID+" amount#"+amount+" params#"+ LogUtil.toLogString(params));
-                    //				HashMap<String,String> extra=JSON.parseObject(attach, HashMap.class);
+                    //HashMap<String,String> extra=JSON.parseObject(attach, HashMap.class);
                     try {
                         chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
                     } catch (Exception e) {

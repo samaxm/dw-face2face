@@ -41,7 +41,7 @@ public class SecurityController {
 	
 	@RequestMapping("/report")
 	@ResponseBody
-	@Frequency(limit=2,time=60000)
+	@Frequency(limit=20,time=60000)
 	public ResultBean reportUser(@RequestParam String reporterID,@RequestParam String reportedID,@RequestParam String reason){
 		ResultBean bean=null;
 		if(reason!=null&&reason.length()>100){
@@ -56,7 +56,7 @@ public class SecurityController {
 	
 	@RequestMapping(value="/advise", method = RequestMethod.POST)
 	@ResponseBody
-	@Frequency(limit=1,time=60000)
+	@Frequency(limit=10,time=60000)
 	public ResultBean advise(MultipartFile voice,HttpServletRequest request) throws IOException{
 		ResultBean bean;
 		String dwID=request.getParameter("dwID");
@@ -78,7 +78,6 @@ public class SecurityController {
 		return authorityService.getRSAKey();
 	}
 
-
 	@RequestMapping(value="/key/upload")
 	@ResponseBody
 	public ResultBean uploadAES(@RequestParam String dwID,@RequestParam String password,@RequestParam String key) throws IOException{
@@ -87,14 +86,13 @@ public class SecurityController {
 
 	@RequestMapping("/forget/password")
 	@ResponseBody
-	@Frequency(limit = 3,time = 6000)
+	@Frequency(limit = 30,time = 6000)
 	public ResultBean resetPassword(@RequestParam String phoneNum){
 		if(phoneNum.length()!=11){
 			return ResultBean.FAIL("请输入11位手机号码");
 		}
 		return SMSservice.sendPhoneCode(phoneNum, PhoneCodeType.SETPWD, IDUtil.createRandomCode());
 	}
-
 
 	@RequestMapping("/forget/password/check")
 	@ResponseBody
