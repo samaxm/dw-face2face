@@ -1,6 +1,6 @@
 package online.decentworld.face2face.controller;
 
-import online.decentworld.face2face.common.PhoneCodeType;
+import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.RegisterStrategyFactory;
 import online.decentworld.face2face.service.sms.SMSService;
@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 @RequestMapping("/user/register")
 @Controller
-public class UserRegisterController {
+public class RegisterController {
 
     @Autowired
     private RegisterStrategyFactory registerService;
@@ -31,8 +31,7 @@ public class UserRegisterController {
     private SMSService SMSservice;
 
 
-    private static Logger logger= LoggerFactory.getLogger(UserRegisterController.class);
-
+    private static Logger logger= LoggerFactory.getLogger(RegisterController.class);
 
     @RequestMapping("/")
     @ResponseBody
@@ -47,7 +46,6 @@ public class UserRegisterController {
     @RequestMapping("/v2")
     @ResponseBody
     public ResultBean registerV2( String registerInfo,@RequestParam String registerType,HttpServletRequest request) throws IOException, ServletException {
-
         ResultBean bean=null;
         IRegisterService service=registerService.getService(registerType.toUpperCase());
         if(service==null){
@@ -61,7 +59,7 @@ public class UserRegisterController {
     @RequestMapping("/send/code")
     @ResponseBody
     public ResultBean sendCode(@RequestParam String phoneNum){
-        return SMSservice.sendPhoneCode(phoneNum, PhoneCodeType.BIND, IDUtil.createRandomCode());
+        return SMSservice.sendPhoneCode(phoneNum, TokenType.BIND_PHONE, IDUtil.createRandomCode());
     }
 
 }

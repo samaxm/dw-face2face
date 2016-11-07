@@ -40,20 +40,6 @@ public class UserActivityController {
         }
     }
 
-
-    @RequestMapping("/reset/password")
-    @ResponseBody
-    public ResultBean resetPassword(@RequestParam String phoneNum,@RequestParam String password,@RequestParam String token){
-        try {
-            return userActivityService.resetPassword(phoneNum, token,password);
-        } catch (Exception e) {
-            logger.debug("",e);
-            return ResultBean.FAIL("重置密码失败，请重试！");
-        }
-    }
-
-
-
     @RequestMapping("/logout")
     @ResponseBody
     public ResultBean logout(String user){

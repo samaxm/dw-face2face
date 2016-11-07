@@ -22,8 +22,6 @@ import static online.decentworld.cache.redis.ReturnResult.result;
 public class MatchQueueCache extends RedisTemplate {
 	
 	private static Logger logger=LoggerFactory.getLogger(MatchQueueCache.class);
-
-	
 //	public String getMatchUser(MatchUserInfo userInfo,int index){
 //		Jedis jedis=null;
 //		try{
@@ -53,18 +51,26 @@ public class MatchQueueCache extends RedisTemplate {
 	public String getMatchUser(MatchUserInfo userInfo,int index){
 		logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID()+" index#"+index);
 		ReturnResult result=cache((Jedis jedis)->{
-			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
+			String info=jedis.spop(WebCacheKey.MATCH_SET);
+//			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
 			if(info!=null){
 				return result(info);
 			}else{
 				//需要将用户加入等待队列
-				jedis.rpush(WebCacheKey.MATCH_QUEUE_KEY(index), JSON.toJSONString(userInfo));
+//				jedis.rpush(WebCacheKey.MATCH_QUEUE_KEY(index), JSON.toJSONString(userInfo));
+				jedis.sadd(WebCacheKey.MATCH_SET,JSON.toJSONString(userInfo));
 				return ReturnResult.SUCCESS;
 			}
 		});
 		return (String)result.getResult();
 	}
-	
-	
-	
+
+	public void removeMatchUser(MatchUserInfo userInfo){
+		logger.debug("[REMOVE_MATCH] dwID#"+userInfo.getDwID());
+		cache((Jedis jedis)->{
+			jedis.srem(WebCacheKey.MATCH_SET,JSON.toJSONString(userInfo));
+			return ReturnResult.SUCCESS;
+		});
+	}
+
 }

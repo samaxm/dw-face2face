@@ -3,8 +3,6 @@ package online.decentworld.face2face.service.user.impl;
 import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.AccountType;
-import online.decentworld.face2face.common.StatusCode;
-import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserActivityService;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
@@ -57,21 +55,5 @@ public class UserActivityService implements IUserActivityService {
         }else{
             return ResultBean.FAIL("密码错误");
         }
-    }
-
-    @Override
-    public ResultBean resetPassword(String phoneNum,String token, String password) throws Exception {
-        ResultBean bean=new ResultBean();
-        password= AES.decode(password);
-        if(tokenCheckService.checkToken(phoneNum, TokenType.CHANGEPWD, token)){
-            userMapper.resetPassword(phoneNum,password);
-            User user=userMapper.selectByPhoneNum(phoneNum);
-            easemobApiUtil.resetPassword(user.getId(),password);
-            bean.setStatusCode(StatusCode.SUCCESS);
-        }else{
-            bean.setStatusCode(StatusCode.FAILED);
-            bean.setMsg("驗證碼錯誤,请重新获取验证码");
-        }
-        return bean;
     }
 }

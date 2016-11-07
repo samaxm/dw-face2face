@@ -4,8 +4,7 @@ import online.decentworld.face2face.cache.SecurityCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
-import online.decentworld.rdb.entity.PayPassword;
-import online.decentworld.rdb.mapper.PayPasswordMapper;
+import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -29,8 +28,7 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	private UserMapper userMapper;
 	@Autowired
 	private SecurityCache securityCache;
-	@Autowired
-	private PayPasswordMapper payPasswordMapper;
+
 
 
 	private static Logger logger= LoggerFactory.getLogger(RDBUserAuthorityService.class);
@@ -75,10 +73,23 @@ public class RDBUserAuthorityService implements IUserAuthorityService{
 	}
 
 	@Override
+	public boolean preSetPayPassowrd(String dwID, String phoneNum) {
+		User user=userMapper.selectByPrimaryKey(dwID);
+		if(user.getPhone()==null||user.getAccount()==null){
+			return false;
+		}else if(!phoneNum.equals(user.getPhone())){
+			logger.debug("[ERROR PHONE]");
+			return false;
+		}else{
+			return true;
+		}
+	}
+
+	@Override
 	public boolean checkPayPassword(String dwID, String payPassword) {
 		payPassword=AES.decode(payPassword,getUserKey(dwID));
-		PayPassword record=payPasswordMapper.selectByPrimaryKey(dwID);
-		if(record!=null&&record.getPayPassword().equals(payPassword)){
+		String storedPayPassword=userMapper.getUserPayPassword(dwID);
+		if(storedPayPassword!=null&&storedPayPassword.equals(payPassword)){
 			return true;
 		}
 		return false;

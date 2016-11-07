@@ -1,12 +1,12 @@
 package online.decentworld.face2face.service.wealth.impl;
 
-import online.decentworld.charge.service.IOrderService;
-import online.decentworld.charge.service.OrderReceipt;
-import online.decentworld.charge.service.OrderType;
-import online.decentworld.charge.service.PayChannel;
-import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
+import online.decentworld.charge.service.*;
 import online.decentworld.face2face.service.wealth.IWealthService;
+import online.decentworld.rdb.entity.TransferHistory;
+import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
+import online.decentworld.rdb.mapper.TransferHistoryMapper;
+import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -21,9 +21,11 @@ public class WealthService implements IWealthService {
     @Autowired
     private IOrderService orderService;
     @Autowired
-    private IUserAuthorityService authorityService;
+    private TransferHistoryMapper transferHistoryMapper;
     @Autowired
     private WealthMapper wealthMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public ResultBean getUserWealth(String dwID) {
@@ -33,6 +35,30 @@ public class WealthService implements IWealthService {
         else
             return ResultBean.FAIL("用户ID不存在");
 
+    }
+
+    @Override
+    public ResultBean withdrawWealth(String dwID, String pay_password, int amount) {
+        if(amount<=0){
+            return ObjectResultBean.FAIL("请提取正整数金额");
+        }else{
+            User user=userMapper.selectByPrimaryKey(dwID);
+            if(user==null){
+                return ObjectResultBean.FAIL("用户不存在");
+            }else if(user.getAccount()==null||user.getAccountType()==null){
+                return ObjectResultBean.FAIL("为了您的账户安全,请先绑定收款账户");
+            }else if(user.getPhone()==null||user.getPhone().length()==0){
+                return ObjectResultBean.FAIL("为了您的账户安全,请先绑定手机号码");
+            }else if(user.getPayPassword()==null){
+                return ObjectResultBean.FAIL("为了您的账户安全,请先设置支付密码");
+            }else{
+                TransferHistory transferHistory=new TransferHistory(user.getId(),amount, TransferStatus.PROCESSING.name(),user.getAccount());
+                transferHistoryMapper.insert(transferHistory);
+
+            }
+
+        }
+        return null;
     }
 
 
@@ -45,6 +71,4 @@ public class WealthService implements IWealthService {
             return ResultBean.FAIL("创建订单失败，请重试!");
         }
     }
-
-
 }

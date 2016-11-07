@@ -90,7 +90,6 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon, boolean isPrioritized) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
-
 			bean.setStatusCode(FAILED);
 			bean.setMsg("抱歉，您被举报次数过多已被封号");
 		}else{
@@ -140,4 +139,8 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		return list;
 	}
 
+	@Override
+	public void removeMatch(String dwID, String name, String icon) {
+		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon));
+	}
 }

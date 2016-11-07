@@ -3,10 +3,7 @@ package online.decentworld.face2face.service.register.impl;
 import com.alibaba.fastjson.JSON;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
-import online.decentworld.face2face.common.CommonProperties;
-import online.decentworld.face2face.common.PhoneCodeType;
-import online.decentworld.face2face.common.StatusCode;
-import online.decentworld.face2face.common.UserType;
+import online.decentworld.face2face.common.*;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.PhoneCodeRegisterInfo;
@@ -45,7 +42,7 @@ public class PhoneCodeRegisterService implements IRegisterService{
     public ResultBean register(String info)  {
         ResultBean bean=null;
         PhoneCodeRegisterInfo infoBean=JSON.parseObject(info,PhoneCodeRegisterInfo.class);
-        if(tokenService.checkPhoneCode(infoBean.getPhoneNum(), PhoneCodeType.BIND,infoBean.getCode())){
+        if(tokenService.checkToken(infoBean.getPhoneNum(), TokenType.BIND_PHONE, infoBean.getCode())){
             try {
                 String password= AES.decode(infoBean.getPassword());
                 String phone=infoBean.getPhoneNum();
@@ -58,7 +55,8 @@ public class PhoneCodeRegisterService implements IRegisterService{
                 easemobAPI.registerEasemobUser(id,password);
                 id=easemobAPI.registerEasemobUser(id,password);
                 user=new User(id,null,null,null,id,
-                        password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.toString(),true);
+                        password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.toString(),true, RegisterChannel.PHONE.name(),null,null,null,(byte)0);
+
                 tryStoreUser(user);
                 Wealth w=new Wealth();
                 w.setDwid(id);

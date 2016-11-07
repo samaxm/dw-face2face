@@ -20,5 +20,7 @@ public interface IUserMatcherService {
 	public ResultBean likeUser(String dwID,String likedID);
 
 	public ListResultBean<LikeRecordDetail> getLikeRecords(String dwID);
+
+	public void removeMatch(String dwID,String name,String icon);
 }
 

@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class OnlineStatusDB {
     /**
-     * only story 24h data
+     * only story 1 month data
      */
-    private static int STORE_LIMIT=24*60;
+    private static int STORE_LIMIT=30*24*60;
 
     private static LinkedList<OnlineStatus> onlineStatuses=new LinkedList<>();
 

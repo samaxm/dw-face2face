@@ -17,6 +17,8 @@
     <button id="12hour">12小时内数据</button>
     <button id="18hour">18小时内数据</button>
     <button id="24hour">24小时内数据</button>
+    <button id="1week">1周内数据</button>
+    <button id="1month">1月内数据</button>
 </body>
  <script type="text/javascript">
 
@@ -25,7 +27,7 @@
      function loadData(hour){
          count=hour*60;
          $.ajax({
-             url: "http://localhost:8080/face2face/app/onlineStatus?count="+count,
+             url: "http://dev.service.dawan.online/face2face/view/chats.html/face2face/app/onlineStatus?count="+count,
              dataType:"json",
              success: function(data){
                  var maxOnline=data.data.maxOnline;
@@ -112,6 +114,8 @@
      $("#12hour").click(function(){loadData(12)});
      $("#18hour").click(function(){loadData(18)});
      $("#24hour").click(function(){loadData(24)});
+     $("#1week").click(function(){loadData(24*7)});
+     $("#1month").click(function(){loadData(24*30)});
      $(document).ready(function(){loadData(1)});
 
     </script>

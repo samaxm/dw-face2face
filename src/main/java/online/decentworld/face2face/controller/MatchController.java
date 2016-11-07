@@ -2,6 +2,7 @@ package online.decentworld.face2face.controller;
 
 import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.service.match.IUserMatcherService;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,10 +43,19 @@ public class MatchController {
 		return matchService.getLikeRecords(dwID);
 	}
 
-	@Frequency(limit=150,time=15000)
+//	@Frequency(limit=150,time=15000)
 	@RequestMapping("/getMatch/v2")
 	@ResponseBody
 	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
 		return matchService.getMatchUserWithPriority(dwID,name,icon,isPrioritized);
+	}
+
+
+//	@Frequency(limit=150,time=15000)
+	@RequestMapping("/remove")
+	@ResponseBody
+	public ResultBean remove(@RequestParam String dwID,@RequestParam String name,String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
+		matchService.removeMatch(dwID, name, icon);
+		return ObjectResultBean.SUCCESS;
 	}
 }

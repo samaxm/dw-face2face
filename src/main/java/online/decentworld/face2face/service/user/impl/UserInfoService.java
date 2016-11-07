@@ -1,22 +1,17 @@
 package online.decentworld.face2face.service.user.impl;
 
 import com.alibaba.fastjson.JSON;
-import online.decentworld.face2face.common.PhoneCodeType;
+import online.decentworld.charge.service.TransferAccountType;
+import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.TokenType;
-import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
-import online.decentworld.rdb.entity.PayPassword;
 import online.decentworld.rdb.entity.User;
-import online.decentworld.rdb.entity.UserInfo;
-import online.decentworld.rdb.mapper.PayPasswordMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-import online.decentworld.tools.AES;
-import online.decentworld.tools.IDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,29 +28,23 @@ public class UserInfoService implements IUserInfoService{
 	@Autowired
 	private ITokenCheckService tokenService;
 	@Autowired
-	private IUserAuthorityService authorityService;
-	@Autowired
-	private PayPasswordMapper payPasswordMapper;
+	private EasemobApiUtil easemobApiUtil;
+
+
 	
 	private static Logger logger=LoggerFactory.getLogger(UserInfoService.class);
 
 	@Override
 	public ResultBean bindUserPhoneNum(String dwID, String phoneNum,String code) {
-
-		if(!tokenService.checkPhoneCode(phoneNum, PhoneCodeType.BIND, code)){
+		if(!tokenService.checkToken(phoneNum,TokenType.BIND_PHONE,code)){
 			return ObjectResultBean.FAIL("验证码错误");
 		}else{
-			UserInfo info=new UserInfo();
-			info.setDwid(dwID);
-			info.setPhonenum(phoneNum);
 			try {
 				userMapper.bindPhoneNum(phoneNum, dwID);
+				return ResultBean.SUCCESS;
 			}catch (DuplicateKeyException e){
 				return ObjectResultBean.FAIL("该手机号码已被绑定");
 			}
-			String token=IDUtil.randomToken();
-			tokenService.cacheToken(token,phoneNum,TokenType.CHANGEPWD);
-			return ObjectResultBean.SUCCESS(token);
 		}
 	}
 
@@ -99,32 +88,15 @@ public class UserInfoService implements IUserInfoService{
 	}
 
 	@Override
-	public ResultBean preSetUserPayPassword(String dwID, String password) {
-		if(authorityService.checkPayPassword(dwID,password)){
-			String token=IDUtil.randomToken();
-			tokenService.cacheToken(token,dwID, TokenType.SET_PAY_PASSWORD);
-			return  ObjectResultBean.SUCCESS(token);
-		}else{
-			return ResultBean.FAIL("登录密码错误，请重试或通过手机号码找回密码");
-		}
+	public ResultBean bindAccount(String dwID,TransferAccountType accountType, String account) {
+		userMapper.bindAccount(account,accountType.name(),dwID);
+		return ResultBean.SUCCESS;
 	}
 
 	@Override
-	public ResultBean setUserPayPassword(String dwID, String payPassword,String token) {
-		if(tokenService.checkToken(dwID,TokenType.SET_PAY_PASSWORD,token)){
-			payPassword= AES.decode(payPassword,authorityService.getUserKey(dwID));
-			PayPassword payPasswordrecord=new PayPassword();
-			payPasswordrecord.setDwid(dwID);
-			payPasswordrecord.setPayPassword(payPassword);
-			payPasswordMapper.insert(payPasswordrecord);
-			return ResultBean.SUCCESS;
-		}else{
-			return ResultBean.FAIL("令牌错误，请验证登录密码后设置支付密码");
-		}
+	public void setUserPayPassword(String dwID, String payPassword) {
+		userMapper.setPayPassword(dwID,payPassword);
 	}
-
-
-
 
 	public static User UserFieldFilter(User user){
 		user.setPassword(null);
@@ -134,4 +106,14 @@ public class UserInfoService implements IUserInfoService{
 		user.setVersion(null);
 		return user;
 	}
+
+	@Override
+	public void setPassword(String dwID, String password) throws Exception {
+		User user=new User();
+		user.setId(dwID);
+		user.setPassword(password);
+		userMapper.updateByPrimaryKeySelective(user);
+		easemobApiUtil.resetPassword(dwID,password);
+	}
+
 }

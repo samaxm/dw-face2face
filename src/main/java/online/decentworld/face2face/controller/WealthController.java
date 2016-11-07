@@ -65,6 +65,21 @@ public class WealthController {
         }
     }
 
+    @RequestMapping("/withdraw")
+    @ResponseBody
+    public ResultBean withdrawMoney(HttpServletRequest request,@RequestParam String dwID,@RequestParam String pay_password,@RequestParam int amount){
+//        Boolean isValidate= (Boolean) request.getAttribute(AttributeKey.isValidate);
+//        if(isValidate==null||!isValidate){
+//            return ObjectResultBean.FAIL("invalidate key");
+//        }
+
+        logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
+
+        return wealthService.withdrawWealth(dwID,pay_password,amount);
+
+    }
+
+
     @RequestMapping("")
     @ResponseBody
     public ResultBean getUserWealth(HttpServletRequest request){
@@ -77,6 +92,7 @@ public class WealthController {
         logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
         return wealthService.getUserWealth(dwID);
     }
+
 
 
     @RequestMapping("/response/wx")
@@ -166,5 +182,8 @@ public class WealthController {
         }
         return null;
     }
+
+
+
 
 }

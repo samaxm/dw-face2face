@@ -3,9 +3,7 @@ package online.decentworld.face2face.cache;
 import online.decentworld.cache.redis.CacheKey;
 import online.decentworld.cache.redis.RedisTemplate;
 import online.decentworld.cache.redis.ReturnResult;
-import online.decentworld.face2face.common.PhoneCodeType;
 import online.decentworld.face2face.common.TokenType;
-import online.decentworld.face2face.exception.CachePhoneCodeFailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,7 +11,6 @@ import redis.clients.jedis.Jedis;
 
 import static online.decentworld.cache.redis.ReturnResult.SUCCESS;
 import static online.decentworld.cache.redis.ReturnResult.result;
-import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.REGISTER_CODE_EXPIRE;
 import static online.decentworld.face2face.config.ConfigLoader.SecurityConfig.TOKEN_EXPIRE;
 
 /**
@@ -27,31 +24,31 @@ public class SecurityCache extends RedisTemplate{
 	private static Logger logger=LoggerFactory.getLogger(SecurityCache.class);
 	
 
-	/**
-	 * 緩存用戶驗證碼
-	 * @throws CachePhoneCodeFailed 
-	 */
-	public void cachePhoneCode(String phoneNum,String code,PhoneCodeType type) throws CachePhoneCodeFailed{
-		ReturnResult result=cache((Jedis jedis)->{
-			jedis.setex(WebCacheKey.PHONECODE_KEY(phoneNum,type), REGISTER_CODE_EXPIRE, code);
-			return SUCCESS;
-		});
-		if(!result.isSuccess()){
-			throw new CachePhoneCodeFailed(phoneNum);
-		}
-	} 
-	
-	/**
-	 * 獲取用戶驗證碼
-	 */
-	public String getPhoneCodeCache(String phoneNum,PhoneCodeType type){
-		ReturnResult result=cache((Jedis jedis)->{
-			String key=WebCacheKey.PHONECODE_KEY(phoneNum,type);
-			String code=jedis.get(key);
-			return result(code);
-		});
-		return (String)result.getResult();
-	} 
+//	/**
+//	 * 緩存用戶驗證碼
+//	 * @throws CachePhoneCodeFailed
+//	 */
+//	public void cachePhoneCode(String phoneNum,String code,PhoneCodeType type) throws CachePhoneCodeFailed{
+//		ReturnResult result=cache((Jedis jedis)->{
+//			jedis.setex(WebCacheKey.PHONECODE_KEY(phoneNum,type), REGISTER_CODE_EXPIRE, code);
+//			return SUCCESS;
+//		});
+//		if(!result.isSuccess()){
+//			throw new CachePhoneCodeFailed(phoneNum);
+//		}
+//	}
+//
+//	/**
+//	 * 獲取用戶驗證碼
+//	 */
+//	public String getPhoneCodeCache(String phoneNum,PhoneCodeType type){
+//		ReturnResult result=cache((Jedis jedis)->{
+//			String key=WebCacheKey.PHONECODE_KEY(phoneNum,type);
+//			String code=jedis.get(key);
+//			return result(code);
+//		});
+//		return (String)result.getResult();
+//	}
 	
 	
 	/**

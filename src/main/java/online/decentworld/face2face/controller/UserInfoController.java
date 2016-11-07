@@ -1,8 +1,8 @@
 package online.decentworld.face2face.controller;
 
 import com.alibaba.fastjson.JSON;
+import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.common.FileSubfix;
-import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
@@ -19,14 +19,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.util.Collection;
-
-import static online.decentworld.face2face.common.CommonProperties.HTTP;
-import static online.decentworld.face2face.config.ConfigLoader.DomainConfig.FDFS_DOMAIN;
 
 
 @RequestMapping("/user")
@@ -48,17 +44,21 @@ public class UserInfoController {
 		}
 	}
 
-	@RequestMapping("/info/pay_password/token")
-	@ResponseBody
-	public ResultBean preSetPayPassword(@RequestParam String dwID,@RequestParam String password){
-		return userService.preSetUserPayPassword(dwID,password);
-	}
-
-
 	@RequestMapping("/bind/phone")
 	@ResponseBody
 	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code){
 		return userService.bindUserPhoneNum(dwID, phoneNum, code);
+	}
+
+	@RequestMapping("/bind/account")
+	@ResponseBody
+	public ResultBean bindAccount(@RequestParam String dwID,@RequestParam String account,@RequestParam String accountType){
+		try{
+			TransferAccountType type=TransferAccountType.valueOf(accountType);
+			return userService.bindAccount(dwID,type,account);
+		}catch (Exception e){
+			return ObjectResultBean.FAIL("绑定账户失败");
+		}
 	}
 
 
@@ -106,26 +106,26 @@ public class UserInfoController {
 		}
 	}
 
-	@RequestMapping("/set/icon")
-	@ResponseBody
-	public ResultBean setUserInfo(MultipartFile file,@RequestParam String dwID){
-		ResultBean bean=new ResultBean();
-		if(file==null||file.isEmpty()){
-			bean.setStatusCode(StatusCode.FAILED);
-			bean.setMsg("请选中头像");
-		}else{
-			try {
-				String url=FastDFSClient.upload(file.getBytes(), FileSubfix.JPG,null);
-				User user=new User();
-				user.setId(dwID);
-				user.setIcon(HTTP+FDFS_DOMAIN+"/"+url);
-				bean=userService.updateUserInfo(user);
-			} catch (Exception e) {
-				bean.setStatusCode(StatusCode.FAILED);
-				bean.setMsg("上传失败");
-			}
-		}
-		return bean;
-	}
+//	@RequestMapping("/set/icon")
+//	@ResponseBody
+//	public ResultBean setUserInfo(MultipartFile file,@RequestParam String dwID){
+//		ResultBean bean=new ResultBean();
+//		if(file==null||file.isEmpty()){
+//			bean.setStatusCode(StatusCode.FAILED);
+//			bean.setMsg("请选中头像");
+//		}else{
+//			try {
+//				String url=FastDFSClient.upload(file.getBytes(), FileSubfix.JPG,null);
+//				User user=new User();
+//				user.setId(dwID);
+//				user.setIcon(HTTP+FDFS_DOMAIN+"/"+url);
+//				bean=userService.updateUserInfo(user);
+//			} catch (Exception e) {
+//				bean.setStatusCode(StatusCode.FAILED);
+//				bean.setMsg("上传失败");
+//			}
+//		}
+//		return bean;
+//	}
 
 }

@@ -2,9 +2,10 @@ package online.decentworld.face2face.service.register.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
-import online.decentworld.face2face.common.StatusCode;
+import online.decentworld.face2face.common.RegisterChannel;
 import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.exception.RegisterFailException;
@@ -15,7 +16,6 @@ import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-import online.decentworld.tools.AES;
 import online.decentworld.tools.IDUtil;
 import online.decentworld.tools.MD5;
 import org.slf4j.Logger;
@@ -39,57 +39,50 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
     private WealthMapper wealthMapper;
 
 
+
+
     @Override
     public ResultBean register(String info) {
-        ObjectResultBean bean=new ObjectResultBean();
         try {
             User user = JSON.parseObject(info, User.class);
-            String password = null;
-            if(user.getPassword()==null){
-                //若用户未设置密码，为第三方登录，使用第三方openid作为临时密码
-                String unionid=user.getUnionid();
-                if(unionid!=null){
-                    //先校验用户是否已经注册
-                    User isuser=userMapper.selectByUnionid(unionid);
-                    if(isuser!=null){
-                        bean.setStatusCode(StatusCode.SUCCESS);
-                        bean.setData(resetFields(isuser));
-                        return bean;
-                    }
-                    password= MD5.GetMD5Code(unionid);
-                }
-            }else{
-                password=MD5.GetMD5Code(AES.decode(user.getPassword()));
+            String unionid=user.getUnionid();
+            if(unionid==null){
+                return ObjectResultBean.FAIL("信息不完整");
             }
-            user.setPassword(password);
-            user.setId(IDUtil.getDWID());
-            user.setType(UserType.UNCERTAIN.toString());
-            user.setVersion(0);
-            user.setWorth(CommonProperties.DEFAULT_WORTH);
-            user.setInit(false);
-
-            Wealth w=new Wealth();
-            w.setDwid(user.getId());
-            w.setWealth(0);
-            wealthMapper.insert(w);
-
-            if(checkField(user)){
-                tryStoreUser(user);
-                if(Boolean.valueOf(ConfigLoader.AdminConfig.NEED_EASEMON)){
-                    easemobAPI.registerEasemobUser(user.getId(),user.getPassword());
-                }
-                bean.setStatusCode(StatusCode.SUCCESS);
-                bean.setData(resetFields(user));
+            User isuser=userMapper.selectByUnionid(unionid);
+            if(isuser!=null){
+                return ObjectResultBean.SUCCESS(resetFields(isuser));
             }else{
-                bean.setStatusCode(StatusCode.FAILED);
-                bean.setMsg("注册信息缺失");
+                String password= MD5.GetMD5Code(unionid);
+                user.setPassword(password);
+                user.setId(IDUtil.getDWID());
+                user.setType(UserType.UNCERTAIN.toString());
+                user.setVersion(0);
+                user.setWorth(CommonProperties.DEFAULT_WORTH);
+                user.setInit(false);
+                if(RegisterChannel.WEIXIN.name().equals(user.getRegisterChannel())){
+                    user.setAccount(user.getOpenid());
+                    user.setAccountType(TransferAccountType.WXPAY.name());
+                }
+                Wealth w=new Wealth();
+                w.setDwid(user.getId());
+                w.setWealth(0);
+                if(checkField(user)) {
+                    tryStoreUser(user);
+                    if (Boolean.valueOf(ConfigLoader.AdminConfig.NEED_EASEMON)) {
+                        easemobAPI.registerEasemobUser(user.getId(), user.getPassword());
+                    }
+                    wealthMapper.insert(w);
+
+                    return ObjectResultBean.SUCCESS(resetFields(user));
+                }else{
+                    return ObjectResultBean.FAIL("注册信息缺失");
+                }
             }
         }catch (Exception e){
             logger.debug("[PARSE_USER_INFO]",e);
-            bean.setStatusCode(StatusCode.FAILED);
-            bean.setMsg("用户信息格式错误");
+            return ObjectResultBean.FAIL("用户信息格式错误");
         }
-        return bean;
     }
 
 

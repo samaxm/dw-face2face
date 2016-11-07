@@ -34,4 +34,6 @@ public class WebCacheKey extends CacheKey {
         return "MATCH:QUEUE:"+index;
     }
 
+    public static String MATCH_SET="MATCH:SET";
+
 }
