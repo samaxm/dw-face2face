@@ -8,6 +8,7 @@ import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.rdb.config.DBConfig;
 import online.decentworld.rdb.mapper.ConsumePriceMapper;
 import online.decentworld.rdb.mapper.OrderMapper;
+import online.decentworld.rdb.mapper.TransferHistoryMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +50,8 @@ public class ApplicationRootConfig {
 	}
 
 	@Bean
-	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper){
-		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper);
+	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper,TransferHistoryMapper transferHistoryMapper){
+		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper,transferHistoryMapper);
 	}
 
 

@@ -61,6 +61,16 @@ public class UserInfoController {
 		}
 	}
 
+	@RequestMapping("/bind/jpush")
+	@ResponseBody
+	public ResultBean bindJpush(@RequestParam String dwID,@RequestParam String JpushID){
+		try{
+			return userService.bindJPush(dwID,JpushID);
+		}catch (Exception e){
+			return ObjectResultBean.FAIL("绑定账户失败");
+		}
+	}
+
 
 	@RequestMapping("/set/info")
 	@ResponseBody

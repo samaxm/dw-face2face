@@ -2,11 +2,12 @@ package online.decentworld.face2face.service.match.impl;
 
 
 import com.alibaba.fastjson.JSON;
+import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.face2face.cache.MatchQueueCache;
 import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
-import online.decentworld.face2face.service.user.IUserInfoService;
+import online.decentworld.face2face.tools.Jpush;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
@@ -42,7 +43,9 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	@Autowired
 	private LikeRecordMapper likeMapper;
 	@Autowired
-	private IUserInfoService infoService;
+	private SessionCache sessionCache;
+	@Autowired
+	private Jpush jpush;
 
 
 	private static Logger logger= LoggerFactory.getLogger(UserDefaultMatcherService.class);
@@ -120,7 +123,13 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		LikeRecord record=new LikeRecord(dwID,likedID);
 		try{
 			likeMapper.insertSelective(record);
-
+			/*
+				给被收藏用户发送通知
+			 */
+			String offlinePush=sessionCache.getOfflinePushChannle(likedID);
+			if(offlinePush!=null){
+				jpush.pushMessage(dwID,offlinePush);
+			}
 		}catch(DuplicateKeyException ex){
 		} catch (Exception e) {
 			logger.warn("[SEND_MQ_FAILED] LIKE_MESSAGE dwID#"+dwID+" likedID#"+likedID,e);

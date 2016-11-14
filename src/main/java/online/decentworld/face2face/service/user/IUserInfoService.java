@@ -30,13 +30,23 @@ public interface IUserInfoService {
 	public ResultBean updateUserInfo(User user);
 
 	/**
-	 * 绑定用户微信账户
+	 * 绑定用户转账账户
 	 * @param dwID
 	 * @param account
 	 * @return
 	 */
 	public ResultBean bindAccount(String dwID,TransferAccountType accountType,String account);
 
+	/**
+	 * 绑定极光推送ID
+	 * @param dwID
+	 * @param jpushID
+	 */
+	public ResultBean bindJPush(String dwID, String jpushID);
+
+
+
+	public String getJPush(String dwID);
 
 	/**
 	 *
@@ -47,7 +57,9 @@ public interface IUserInfoService {
 	public void setUserPayPassword(String dwID,String payPassword);
 
 	@Transactional
-	public void setPassword(String dwID,String password) throws Exception;
+	public void setPassword(String phoneNum,String password) throws Exception;
+
+
 
 
 }

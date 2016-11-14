@@ -12,6 +12,6 @@ public interface IWealthService {
 
     ResultBean getUserWealth(String dwID);
 
-    ResultBean withdrawWealth(String dwID,String pay_password,int amount);
+    ResultBean withdrawWealth(String dwID,String pay_password,int amount,String ip);
 
 }

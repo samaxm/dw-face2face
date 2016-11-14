@@ -95,37 +95,29 @@ public class SecurityController {
 	@RequestMapping("/password/token")
 	@ResponseBody
 	@Frequency(limit = 30,time = 6000)
-	public ResultBean resetPassword(@RequestParam String dwID,@RequestParam String phoneNum){
+	public ResultBean resetPassword(@RequestParam String phoneNum){
 		if(phoneNum.length()!=11){
 			return ResultBean.FAIL("请输入11位手机号码");
 		}
-		if(authorityService.preSetPayPassowrd(dwID, phoneNum)){
-			return sMSservice.sendPhoneCode(phoneNum, TokenType.PRE_CHANGE_PWD, IDUtil.createRandomCode());
-		}else{
-			return ObjectResultBean.FAIL("绑定的手机号有误！");
-		}
+		return sMSservice.sendPhoneCode(phoneNum, TokenType.PRE_CHANGE_PWD, IDUtil.createRandomCode());
 	}
 
 	@RequestMapping("/password/token/check")
 	@ResponseBody
-	public ResultBean checkPhoneCode(@RequestParam String dwID,@RequestParam String phoneCode,@RequestParam String phoneNum){
+	public ResultBean checkPhoneCode(@RequestParam String phoneCode,@RequestParam String phoneNum){
 		if(phoneNum==null||phoneNum.length()!=11){
 			return ObjectResultBean.FAIL("请绑定正确的手机号码");
 		}else{
-			if(authorityService.preSetPayPassowrd(dwID, phoneNum)){
-				return tokenService.checkPhoneCodeAndCreateToken(phoneNum,TokenType.PRE_CHANGE_PWD,phoneCode,dwID,TokenType.CHANGE_PWD);
-			}else{
-				return ObjectResultBean.FAIL("绑定的手机号有误！");
-			}
+			return tokenService.checkPhoneCodeAndCreateToken(phoneNum,TokenType.PRE_CHANGE_PWD,phoneCode,phoneNum,TokenType.CHANGE_PWD);
 		}
 	}
 	@RequestMapping("/password")
 	@ResponseBody
-	public ResultBean resetPassword(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String password,@RequestParam String token){
-		if(tokenService.checkToken(dwID,TokenType.SET_PAY_PASSWORD,token)){
+	public ResultBean resetPassword(@RequestParam String phoneNum,@RequestParam String password,@RequestParam String token){
+		if(tokenService.checkToken(phoneNum,TokenType.SET_PAY_PASSWORD,token)){
 			password= AES.decode(password);
 			try {
-				userInfoService.setPassword(dwID, password);
+				userInfoService.setPassword(phoneNum, password);
 				return ResultBean.SUCCESS;
 			}catch (Exception e){
 				logger.warn("",e);

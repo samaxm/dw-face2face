@@ -10,6 +10,8 @@ import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
+import online.decentworld.face2face.service.search.ISearchService;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -37,7 +39,8 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
     private EasemobApiUtil easemobAPI;
     @Autowired
     private WealthMapper wealthMapper;
-
+    @Autowired
+    private ISearchService searchService;
 
 
 
@@ -73,7 +76,9 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
                         easemobAPI.registerEasemobUser(user.getId(), user.getPassword());
                     }
                     wealthMapper.insert(w);
-
+                    //添加至索引
+                    BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
+                    searchService.saveOrUpdateIndex(baseInfo);
                     return ObjectResultBean.SUCCESS(resetFields(user));
                 }else{
                     return ObjectResultBean.FAIL("注册信息缺失");

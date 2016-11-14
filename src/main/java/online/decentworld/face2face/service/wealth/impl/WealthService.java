@@ -1,15 +1,21 @@
 package online.decentworld.face2face.service.wealth.impl;
 
+import online.decentworld.charge.ChargeResultCode;
+import online.decentworld.charge.ChargeService;
+import online.decentworld.charge.event.TransferEvent;
+import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.service.*;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.wealth.IWealthService;
-import online.decentworld.rdb.entity.TransferHistory;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
-import online.decentworld.rdb.mapper.TransferHistoryMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.AES;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +27,15 @@ public class WealthService implements IWealthService {
     @Autowired
     private IOrderService orderService;
     @Autowired
-    private TransferHistoryMapper transferHistoryMapper;
-    @Autowired
     private WealthMapper wealthMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private ChargeService chargeService;
+    @Autowired
+    private IUserAuthorityService userAuthorityService;
+
+    private static Logger logger= LoggerFactory.getLogger(WealthService.class);
 
     @Override
     public ResultBean getUserWealth(String dwID) {
@@ -34,11 +44,11 @@ public class WealthService implements IWealthService {
             return ObjectResultBean.SUCCESS(wealth.getWealth());
         else
             return ResultBean.FAIL("用户ID不存在");
-
     }
 
+
     @Override
-    public ResultBean withdrawWealth(String dwID, String pay_password, int amount) {
+    public ResultBean withdrawWealth(String dwID, String pay_password, int amount,String ip) {
         if(amount<=0){
             return ObjectResultBean.FAIL("请提取正整数金额");
         }else{
@@ -52,13 +62,32 @@ public class WealthService implements IWealthService {
             }else if(user.getPayPassword()==null){
                 return ObjectResultBean.FAIL("为了您的账户安全,请先设置支付密码");
             }else{
-                TransferHistory transferHistory=new TransferHistory(user.getId(),amount, TransferStatus.PROCESSING.name(),user.getAccount());
-                transferHistoryMapper.insert(transferHistory);
-
+                pay_password= AES.decode(pay_password,userAuthorityService.getUserKey(dwID));
+                if(!user.getPayPassword().equals(pay_password)){
+                    return ObjectResultBean.FAIL("支付密码错误");
+                }
+                TransferAccountType type;
+                try {
+                    type=TransferAccountType.valueOf(user.getAccountType());
+                }catch (Exception e){
+                    return ObjectResultBean.FAIL("不支持的账户类型，请重新绑定");
+                }
+                try {
+                    ChargeReceipt receipt=chargeService.charge(new TransferEvent(dwID, amount, user.getAccount(), type, ip));
+                    if(receipt.getChargeResult().getStatusCode()== ChargeResultCode.SUCCESS){
+                        return ResultBean.SUCCESS;
+                    }else if(receipt.getChargeResult().getStatusCode()== ChargeResultCode.WEALTH_LACK){
+                        return ObjectResultBean.FAIL("提现失败,余额不足");
+                    }else{
+                        return ObjectResultBean.FAIL("提现失败,请稍后再试");
+                    }
+                } catch (Exception e) {
+                    logger.warn("",e);
+                    return ObjectResultBean.FAIL("提款失败"+e.getMessage());
+                }
             }
 
         }
-        return null;
     }
 
 

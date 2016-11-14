@@ -196,6 +196,13 @@
 			<version>1.7.2.RELEASE</version>
 		</dependency>
 
+
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>5.3.1</version>
+		</dependency>
+
 		<!-- jodis -->
 		<dependency>
 			<groupId>io.codis.jodis</groupId>
@@ -235,6 +242,13 @@
 			<groupId>online.decentworld</groupId>
 			<artifactId>charge</artifactId>
 			<version>1.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>cn.jpush.api</groupId>
+			<artifactId>jpush-client</artifactId>
+			<version>3.2.9</version>
 		</dependency>
 
 		<dependency>

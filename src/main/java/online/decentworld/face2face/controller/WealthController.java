@@ -72,10 +72,9 @@ public class WealthController {
 //        if(isValidate==null||!isValidate){
 //            return ObjectResultBean.FAIL("invalidate key");
 //        }
-
         logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
 
-        return wealthService.withdrawWealth(dwID,pay_password,amount);
+        return wealthService.withdrawWealth(dwID,pay_password,amount,IPHelper.getLocalIP(request));
 
     }
 

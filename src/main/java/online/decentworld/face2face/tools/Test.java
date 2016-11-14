@@ -1,5 +1,8 @@
 package online.decentworld.face2face.tools;
 
+import online.decentworld.tools.AES;
+import online.decentworld.tools.MD5;
+
 /**
  * Created by Sammax on 2016/9/26.
  */
@@ -8,6 +11,9 @@ public class Test {
     private static volatile boolean bChanged;
 
     public static void main(String[] args) throws Exception {
+
+        System.out.println(AES.decode("2EAB7ACDEF213B49FD44C08887DB41A1D065CD22F4B8A895EC3F69EF87537D17360DF0F16CB92B4E8DA9B3ACD680276E","OILVTKOZwL0UUtVC"));
+        System.out.println(MD5.GetMD5Code("123456"));
 //        Cipher cipher = Cipher.getInstance("RSA");
 //
 //        StringBuffer sb = new StringBuffer();
@@ -41,8 +47,6 @@ public class Test {
 //        System.out.println("plain : " + new String(plainText));
 //
 //        System.out.println(RSA.decrypt(data,RSA_PRIVATE,"utf-8"));
-        System.out.println("redis_123124".indexOf("_"));
-        System.out.println("redis_123124".split("_")[1]);
 //        String text="text";
 //        String url=FastDFSClient.upload(text.getBytes(),"txt",null);
 //        System.out.println(url);

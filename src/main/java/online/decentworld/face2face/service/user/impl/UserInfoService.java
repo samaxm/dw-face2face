@@ -1,9 +1,11 @@
 package online.decentworld.face2face.service.user.impl;
 
 import com.alibaba.fastjson.JSON;
+import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.TokenType;
+import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
@@ -12,10 +14,12 @@ import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.IDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -29,9 +33,11 @@ public class UserInfoService implements IUserInfoService{
 	private ITokenCheckService tokenService;
 	@Autowired
 	private EasemobApiUtil easemobApiUtil;
+	@Autowired
+	private ISearchService searchService;
+	@Autowired
+	private SessionCache sessionCache;
 
-
-	
 	private static Logger logger=LoggerFactory.getLogger(UserInfoService.class);
 
 	@Override
@@ -41,7 +47,12 @@ public class UserInfoService implements IUserInfoService{
 		}else{
 			try {
 				userMapper.bindPhoneNum(phoneNum, dwID);
-				return ResultBean.SUCCESS;
+				/**
+				 * 绑定成功后直接返回一个可以设置密码的token
+				 */
+			    String token= IDUtil.randomToken();
+				tokenService.cacheToken(dwID,TokenType.SET_PAY_PASSWORD,token);
+				return ObjectResultBean.SUCCESS(token);
 			}catch (DuplicateKeyException e){
 				return ObjectResultBean.FAIL("该手机号码已被绑定");
 			}
@@ -63,6 +74,7 @@ public class UserInfoService implements IUserInfoService{
 
 
 	@Override
+	@CacheEvict(value="redis_online.decentworld.rdb.entity.BaseDisplayUserInfo" ,key="#user.id")
 	public ResultBean updateUserInfo(User user) {
 		if(user.getName()!=null&&user.getName().length()>20){
 			return ResultBean.FAIL("您的用戶名過長！最多十個字符");
@@ -76,6 +88,9 @@ public class UserInfoService implements IUserInfoService{
 					if(u.getIcon()!=null&&!u.getIcon().equals("")){
 						FastDFSClient.deleteByFullName(u.getIcon());
 					}
+
+					BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
+					searchService.saveOrUpdateIndex(baseInfo);
 					return ObjectResultBean.SUCCESS(user);
 				}else{
 					return ResultBean.FAIL("身份校验错误");
@@ -94,6 +109,17 @@ public class UserInfoService implements IUserInfoService{
 	}
 
 	@Override
+	public ResultBean bindJPush(String dwID, String jpushID) {
+		sessionCache.cacheOfflinePushChannel(dwID,jpushID);
+		return ResultBean.SUCCESS;
+	}
+
+	@Override
+	public String getJPush(String dwID) {
+		return sessionCache.getOfflinePushChannle(dwID);
+	}
+
+	@Override
 	public void setUserPayPassword(String dwID, String payPassword) {
 		userMapper.setPayPassword(dwID,payPassword);
 	}
@@ -108,12 +134,13 @@ public class UserInfoService implements IUserInfoService{
 	}
 
 	@Override
-	public void setPassword(String dwID, String password) throws Exception {
-		User user=new User();
-		user.setId(dwID);
-		user.setPassword(password);
-		userMapper.updateByPrimaryKeySelective(user);
-		easemobApiUtil.resetPassword(dwID,password);
+	public void setPassword(String phoneNum, String password) throws Exception {
+		User user=userMapper.selectByPhoneNum(phoneNum);
+		if(user!=null){
+			userMapper.resetPassword(phoneNum,password);
+			easemobApiUtil.resetPassword(user.getId(),password);
+		}
+
 	}
 
 }

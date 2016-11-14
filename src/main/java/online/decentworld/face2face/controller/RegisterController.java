@@ -31,6 +31,7 @@ public class RegisterController {
     private SMSService SMSservice;
 
 
+
     private static Logger logger= LoggerFactory.getLogger(RegisterController.class);
 
     @RequestMapping("/")
@@ -52,6 +53,7 @@ public class RegisterController {
             ResultBean.FAIL("注册类型错误");
         }else{
             bean=service.register(registerInfo);
+
         }
         return bean;
     }

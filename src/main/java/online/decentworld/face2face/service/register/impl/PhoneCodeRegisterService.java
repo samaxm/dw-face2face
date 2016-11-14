@@ -7,7 +7,9 @@ import online.decentworld.face2face.common.*;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.PhoneCodeRegisterInfo;
+import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -37,10 +39,12 @@ public class PhoneCodeRegisterService implements IRegisterService{
     private UserMapper userMapper;
     @Autowired
     private WealthMapper wealthMapper;
+    @Autowired
+    private ISearchService searchService;
 
     @Override
     public ResultBean register(String info)  {
-        ResultBean bean=null;
+        ResultBean bean;
         PhoneCodeRegisterInfo infoBean=JSON.parseObject(info,PhoneCodeRegisterInfo.class);
         if(tokenService.checkToken(infoBean.getPhoneNum(), TokenType.BIND_PHONE, infoBean.getCode())){
             try {
@@ -65,6 +69,9 @@ public class PhoneCodeRegisterService implements IRegisterService{
                 bean=new ObjectResultBean();
                 bean.setStatusCode(StatusCode.SUCCESS);
                 ((ObjectResultBean)bean).setData(resetFields(user));
+                //添加至索引
+                BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
+                searchService.saveOrUpdateIndex(baseInfo);
             } catch (Exception e) {
                 bean=ResultBean.FAIL("注册失败");
                 logger.warn("[WX_REGISTER_RETRIVEINFO_FAILED]",e);

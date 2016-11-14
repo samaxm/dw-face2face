@@ -1,14 +1,18 @@
 package online.decentworld.face2face.service.register.impl;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.api.wx.WXInfo;
 import online.decentworld.face2face.api.wx.WeChatApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
+import online.decentworld.face2face.common.RegisterChannel;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.exception.*;
 import online.decentworld.face2face.service.register.IRegisterService;
+import online.decentworld.face2face.service.search.ISearchService;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -38,10 +42,9 @@ public class WXEasemobRegisterService implements IRegisterService{
 	private UserMapper userMapper;
 	@Autowired
 	private WealthMapper wealthMapper;
-	
-	
+	@Autowired
+	private ISearchService searchService;
 
-	
 	private static Logger logger=LoggerFactory.getLogger(WXEasemobRegisterService.class);
 
 	@Override
@@ -55,13 +58,17 @@ public class WXEasemobRegisterService implements IRegisterService{
 				String id= IDUtil.getDWID();
 				id=easemobAPI.registerEasemobUser(id,password);
 				user=new User(id,info.getUnionid(),info.getOpenid(),info.getHeadimgurl(),info.getNickname(),
-						password,info.getCity(),CommonProperties.DEFAULT_WORTH,null,info.getSex(),null,0,UserType.UNCERTAIN.toString(),false);
+						password,info.getCity(),CommonProperties.DEFAULT_WORTH,null,info.getSex(),null,0,UserType.UNCERTAIN.toString(),false, RegisterChannel.WEIXIN.name()
+						,info.getOpenid(), TransferAccountType.WXPAY.name(),null,(byte)0);
 				tryStoreUser(user);
 				Wealth w=new Wealth();
 				w.setDwid(id);
 				w.setWealth(0);
 				wealthMapper.insert(w);
 			}
+			//添加至索引
+			BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
+			searchService.saveOrUpdateIndex(baseInfo);
 			bean.setStatusCode(StatusCode.SUCCESS);
 			bean.setData(user); 
 		}catch(GetWXAccessTokenError | GetWXInfoError e){
