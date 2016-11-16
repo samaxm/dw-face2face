@@ -1,5 +1,6 @@
 package online.decentworld.face2face.service.wealth;
 
+import online.decentworld.charge.exception.IllegalChargeException;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.rpc.dto.api.ResultBean;
 
@@ -14,4 +15,7 @@ public interface IWealthService {
 
     ResultBean withdrawWealth(String dwID,String pay_password,int amount,String ip);
 
+    ResultBean tip(String dwID,String pay_password,String tipedID,int amount);
+
+    ResultBean getRechargeResponse(String dwID,String orderNum,int amount) throws IllegalChargeException, Exception;
 }

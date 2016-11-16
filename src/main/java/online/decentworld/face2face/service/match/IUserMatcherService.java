@@ -14,7 +14,7 @@ public interface IUserMatcherService {
 	
 	public ResultBean getMatchUser(String dwID,String name,String icon);
 
-	public ResultBean getMatchUserWithPriority(String dwID,String name,String icon,boolean isPrioritized);
+	public ResultBean getMatchUserWithPriority(String dwID,String name,String icon,String sign,boolean isPrioritized);
 
 	@Transactional
 	public ResultBean likeUser(String dwID,String likedID);

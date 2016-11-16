@@ -1,6 +1,6 @@
 package online.decentworld.face2face.service.search;
 
-import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.entity.User;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ public interface ISearchService {
 
     List searchWholeContext(String searchValue,int page);
 
-    boolean saveOrUpdateIndex(BaseDisplayUserInfo info);
+    boolean saveOrUpdateIndex(User info);
 }

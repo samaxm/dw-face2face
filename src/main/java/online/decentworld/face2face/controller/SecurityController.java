@@ -114,7 +114,7 @@ public class SecurityController {
 	@RequestMapping("/password")
 	@ResponseBody
 	public ResultBean resetPassword(@RequestParam String phoneNum,@RequestParam String password,@RequestParam String token){
-		if(tokenService.checkToken(phoneNum,TokenType.SET_PAY_PASSWORD,token)){
+		if(tokenService.checkToken(phoneNum,TokenType.CHANGE_PWD,token)){
 			password= AES.decode(password);
 			try {
 				userInfoService.setPassword(phoneNum, password);

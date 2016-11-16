@@ -24,7 +24,7 @@ public class RedisTokenCheckService implements ITokenCheckService{
 			tokenCache.cacheToken(cacheKey, cacheType, token);
 			return ObjectResultBean.SUCCESS(token);
 		}else{
-			return ObjectResultBean.FAIL("驗證碼錯誤");
+			return ObjectResultBean.FAIL("验证码错误");
 		}
 	}
 

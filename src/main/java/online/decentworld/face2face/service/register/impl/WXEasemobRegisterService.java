@@ -12,7 +12,6 @@ import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.exception.*;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.search.ISearchService;
-import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -67,8 +66,7 @@ public class WXEasemobRegisterService implements IRegisterService{
 				wealthMapper.insert(w);
 			}
 			//添加至索引
-			BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
-			searchService.saveOrUpdateIndex(baseInfo);
+			searchService.saveOrUpdateIndex(user);
 			bean.setStatusCode(StatusCode.SUCCESS);
 			bean.setData(user); 
 		}catch(GetWXAccessTokenError | GetWXInfoError e){

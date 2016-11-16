@@ -2,12 +2,13 @@ package online.decentworld.face2face.service.match.impl;
 
 
 import com.alibaba.fastjson.JSON;
-import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.face2face.cache.MatchQueueCache;
 import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
+import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.Jpush;
+import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
@@ -15,6 +16,9 @@ import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.rpc.dto.message.LikeMessageBody;
+import online.decentworld.rpc.dto.message.MessageWrapper;
+import online.decentworld.rpc.dto.message.types.MessageType;
 import online.decentworld.tools.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +47,9 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	@Autowired
 	private LikeRecordMapper likeMapper;
 	@Autowired
-	private SessionCache sessionCache;
-	@Autowired
 	private Jpush jpush;
+	@Autowired
+	private IUserInfoService userInfoService;
 
 
 	private static Logger logger= LoggerFactory.getLogger(UserDefaultMatcherService.class);
@@ -90,15 +94,19 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
-	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon, boolean isPrioritized) {
+	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon,String sign, boolean isPrioritized) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
 			bean.setStatusCode(FAILED);
 			bean.setMsg("抱歉，您被举报次数过多已被封号");
 		}else{
-			MatchUserInfo info=new MatchUserInfo(dwID, name, icon);
+			MatchUserInfo info=new MatchUserInfo(dwID, name, icon,sign);
 			MatchUserInfo matched;
 			String matchUserInfo;
+			/**
+			 * set to true while user is not so many
+			 */
+			isPrioritized=true;
 			do{
 				if(isPrioritized){
 					matchUserInfo=matchCache.getMatchUser(info, PRIORITY_QUEUE_NUM);
@@ -123,14 +131,16 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 		LikeRecord record=new LikeRecord(dwID,likedID);
 		try{
 			likeMapper.insertSelective(record);
-			/*
-				给被收藏用户发送通知
-			 */
-			String offlinePush=sessionCache.getOfflinePushChannle(likedID);
-			if(offlinePush!=null){
-				jpush.pushMessage(dwID,offlinePush);
+			try {
+				BaseDisplayUserInfo info=userInfoService.getUserInfo(dwID);
+				LikeMessageBody likeMessageBody=new LikeMessageBody(info.getIcon(),info.getName(),info.getDwID(),likedID,String.valueOf(info.getSex()));
+				MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper(dwID,likedID,likeMessageBody,0);
+				jpush.pushMessage(likedID, MessageType.NOTICE_LIKE,JSON.toJSONString(messageWrapper));
+			}catch (Exception e){
+				logger.warn("",e);
 			}
 		}catch(DuplicateKeyException ex){
+			return ResultBean.FAIL("已经收藏对方了");
 		} catch (Exception e) {
 			logger.warn("[SEND_MQ_FAILED] LIKE_MESSAGE dwID#"+dwID+" likedID#"+likedID,e);
 		}

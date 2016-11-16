@@ -12,6 +12,17 @@ public class MatchUserInfo {
 	
 	private String icon;
 
+	private String sign;
+
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
 	public String getDwID() {
 		return dwID;
 	}
@@ -34,6 +45,14 @@ public class MatchUserInfo {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public MatchUserInfo(String dwID, String name, String icon,String sign) {
+		super();
+		this.dwID = dwID;
+		this.name = name;
+		this.icon = icon;
+		this.sign=sign;
 	}
 
 	public MatchUserInfo(String dwID, String name, String icon) {

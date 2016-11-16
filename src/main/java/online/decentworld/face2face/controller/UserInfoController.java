@@ -57,6 +57,7 @@ public class UserInfoController {
 			TransferAccountType type=TransferAccountType.valueOf(accountType);
 			return userService.bindAccount(dwID,type,account);
 		}catch (Exception e){
+			logger.warn("[BIND_ACCOUNT_FAILED] dwID#"+dwID+" account#"+account+" accountType#"+accountType,e);
 			return ObjectResultBean.FAIL("绑定账户失败");
 		}
 	}

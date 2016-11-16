@@ -3,14 +3,13 @@ package online.decentworld.face2face.service.search.solr;
 import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.entity.User;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,19 +40,21 @@ public class SolrSearchService implements ISearchService {
     }
 
     @Override
-    public boolean saveOrUpdateIndex(BaseDisplayUserInfo userInfo) {
-        if(userInfo==null){
+    public boolean saveOrUpdateIndex(User user) {
+        if(user==null){
             return false;
         }
-        HttpSolrClient client=SolrSearchClient.getSolrClient();
         try {
+
+            HttpSolrClient client=SolrSearchClient.getSolrClient();
+            BaseDisplayUserInfo userInfo=new BaseDisplayUserInfo(user);
             client.addBean(SolrUserInfoBean.convert(userInfo));
             client.optimize();
             client.commit();
             return true;
 
-        } catch (IOException | SolrServerException e) {
-            logger.warn("[UPDATE_FAILED] info#"+ JSON.toJSONString(userInfo),e);
+        } catch (Exception e) {
+            logger.warn("[UPDATE_FAILED] info#"+ JSON.toJSONString(user),e);
             return false;
         }
     }

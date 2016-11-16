@@ -1,7 +1,6 @@
 package online.decentworld.face2face.service.register.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
@@ -11,7 +10,6 @@ import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.search.ISearchService;
-import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -63,6 +61,7 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
                 user.setVersion(0);
                 user.setWorth(CommonProperties.DEFAULT_WORTH);
                 user.setInit(false);
+                user.setCanwithdraw((byte)0);
                 if(RegisterChannel.WEIXIN.name().equals(user.getRegisterChannel())){
                     user.setAccount(user.getOpenid());
                     user.setAccountType(TransferAccountType.WXPAY.name());
@@ -77,8 +76,7 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
                     }
                     wealthMapper.insert(w);
                     //添加至索引
-                    BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
-                    searchService.saveOrUpdateIndex(baseInfo);
+                    searchService.saveOrUpdateIndex(user);
                     return ObjectResultBean.SUCCESS(resetFields(user));
                 }else{
                     return ObjectResultBean.FAIL("注册信息缺失");
@@ -108,6 +106,12 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
         }else if(user.getType()==null){
             logger.debug("[BAD_FIELD] getType#"+user.getType());
             return false;
+        }else if(user.getRegisterChannel()==null){
+            logger.debug("[BAD_FIELD] registerChannel");
+            return false;
+        }else if(user.getCanwithdraw()==null){
+            logger.debug("[BAD_FIELD] can_withdrw");
+            return false;
         }
         return true;
     }
@@ -121,11 +125,13 @@ public class UserInfoEasemobRegisterService implements IRegisterService {
                 userMapper.insert(user);
                 break;
             }catch(Exception e){
-                if(e instanceof MySQLIntegrityConstraintViolationException||
-                        e instanceof DuplicateKeyException){
+                if(e instanceof DuplicateKeyException){
                     logger.info("[REPEAT_NAME]");
                     user.setName(user.getName()+attemp);
                     user.setId(IDUtil.getDWID());
+                }else{
+                    logger.debug("[SAVE_USER_FAILED]",e);
+                    break;
                 }
 
             }

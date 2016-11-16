@@ -50,7 +50,9 @@ public class MatchQueueCache extends RedisTemplate {
 	 */
 	public String getMatchUser(MatchUserInfo userInfo,int index){
 		logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID()+" index#"+index);
+		String myinfo=JSON.toJSONString(userInfo);
 		ReturnResult result=cache((Jedis jedis)->{
+			jedis.srem(WebCacheKey.MATCH_SET,myinfo);
 			String info=jedis.spop(WebCacheKey.MATCH_SET);
 //			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
 			if(info!=null){
@@ -58,7 +60,7 @@ public class MatchQueueCache extends RedisTemplate {
 			}else{
 				//需要将用户加入等待队列
 //				jedis.rpush(WebCacheKey.MATCH_QUEUE_KEY(index), JSON.toJSONString(userInfo));
-				jedis.sadd(WebCacheKey.MATCH_SET,JSON.toJSONString(userInfo));
+				jedis.sadd(WebCacheKey.MATCH_SET,myinfo);
 				return ReturnResult.SUCCESS;
 			}
 		});

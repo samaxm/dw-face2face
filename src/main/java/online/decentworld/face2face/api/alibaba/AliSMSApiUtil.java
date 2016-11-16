@@ -36,7 +36,14 @@ public class AliSMSApiUtil {
 	}
 	
 	public enum SendResult{
-		SUCCESS,FAIL
+		SUCCESS,FAIL;
+		private int code;
+		public void setCode(int code){
+			this.code=code;
+		}
+		public int getCode(){
+			return code;
+		}
 	}
 
 }

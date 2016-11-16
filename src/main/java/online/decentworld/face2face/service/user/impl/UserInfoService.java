@@ -12,8 +12,10 @@ import online.decentworld.face2face.tools.FastDFSClient;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.mapper.UserMapper;
+import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.rpc.dto.api.StatusCode;
 import online.decentworld.tools.IDUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,7 @@ public class UserInfoService implements IUserInfoService{
 				 * 绑定成功后直接返回一个可以设置密码的token
 				 */
 			    String token= IDUtil.randomToken();
-				tokenService.cacheToken(dwID,TokenType.SET_PAY_PASSWORD,token);
+				tokenService.cacheToken(phoneNum,TokenType.CHANGE_PWD,token);
 				return ObjectResultBean.SUCCESS(token);
 			}catch (DuplicateKeyException e){
 				return ObjectResultBean.FAIL("该手机号码已被绑定");
@@ -89,8 +91,7 @@ public class UserInfoService implements IUserInfoService{
 						FastDFSClient.deleteByFullName(u.getIcon());
 					}
 
-					BaseDisplayUserInfo baseInfo=new BaseDisplayUserInfo(user);
-					searchService.saveOrUpdateIndex(baseInfo);
+					searchService.saveOrUpdateIndex(user);
 					return ObjectResultBean.SUCCESS(user);
 				}else{
 					return ResultBean.FAIL("身份校验错误");
@@ -105,7 +106,11 @@ public class UserInfoService implements IUserInfoService{
 	@Override
 	public ResultBean bindAccount(String dwID,TransferAccountType accountType, String account) {
 		userMapper.bindAccount(account,accountType.name(),dwID);
-		return ResultBean.SUCCESS;
+		MapResultBean<String,String> bean=new MapResultBean();
+		bean.getData().put("account",account);
+		bean.getData().put("accountType",accountType.name());
+		bean.setStatusCode(StatusCode.SUCCESS);
+		return bean;
 	}
 
 	@Override

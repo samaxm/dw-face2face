@@ -1,8 +1,5 @@
 package online.decentworld.face2face.tools;
 
-import online.decentworld.tools.AES;
-import online.decentworld.tools.MD5;
-
 /**
  * Created by Sammax on 2016/9/26.
  */
@@ -12,13 +9,10 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println(AES.decode("2EAB7ACDEF213B49FD44C08887DB41A1D065CD22F4B8A895EC3F69EF87537D17360DF0F16CB92B4E8DA9B3ACD680276E","OILVTKOZwL0UUtVC"));
-        System.out.println(MD5.GetMD5Code("123456"));
-//        Cipher cipher = Cipher.getInstance("RSA");
-//
-//        StringBuffer sb = new StringBuffer();
-//        StringBuffer sb2 = new StringBuffer();
-//        try {
+//      Cipher cipher = Cipher.getInstance("RSA");
+//      StringBuffer sb = new StringBuffer();
+//      StringBuffer sb2 = new StringBuffer();
+//      try {
 //            File rsa_public=new File(ConfigLoader.AdminConfig.RSA_PUBLIC);
 //            File rsa_private=new File(ConfigLoader.AdminConfig.RSA_PRIVATE);
 //            InputStream in = new FileInputStream(rsa_public);

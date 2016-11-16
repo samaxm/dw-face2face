@@ -1,8 +1,6 @@
 package online.decentworld.face2face.controller;
 
 import com.alibaba.fastjson.JSON;
-import online.decentworld.charge.ChargeService;
-import online.decentworld.charge.event.RechargeEvent;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.charge.service.alipay.AlipayNotify;
 import online.decentworld.charge.service.alipay.AlipayTradeStatus;
@@ -46,8 +44,7 @@ public class WealthController {
     private static Logger logger= LoggerFactory.getLogger(WealthController.class);
     @Autowired
     private IWealthService wealthService;
-    @Autowired
-    private ChargeService chargeService;
+
 
     @RequestMapping("/recharge")
     @ResponseBody
@@ -68,16 +65,17 @@ public class WealthController {
     @RequestMapping("/withdraw")
     @ResponseBody
     public ResultBean withdrawMoney(HttpServletRequest request,@RequestParam String dwID,@RequestParam String pay_password,@RequestParam int amount){
-//        Boolean isValidate= (Boolean) request.getAttribute(AttributeKey.isValidate);
-//        if(isValidate==null||!isValidate){
-//            return ObjectResultBean.FAIL("invalidate key");
-//        }
-        logger.debug("[GET_USER_WEALTH] dwID#"+dwID);
 
         return wealthService.withdrawWealth(dwID,pay_password,amount,IPHelper.getLocalIP(request));
 
     }
 
+
+    @RequestMapping("/tip")
+    @ResponseBody
+    public ResultBean tip(@RequestParam String dwID,@RequestParam String toID,@RequestParam String pay_password,@RequestParam int amount){
+        return wealthService.tip(dwID,pay_password,toID,amount);
+    }
 
     @RequestMapping("")
     @ResponseBody
@@ -119,7 +117,7 @@ public class WealthController {
                     int amount=Integer.parseInt(map.get("total_fee"));
                     //微信单位为分
                     String dwID= map.get("attach");
-                    chargeService.charge(new RechargeEvent(dwID, amount, orderNum));
+                    wealthService.getRechargeResponse(dwID,orderNum,amount);
                     return WXConfig.SUCCESS;
                 }else{
                     logger.error("签名错误！ return_msg:"+map.get("return_msg"));
@@ -167,7 +165,7 @@ public class WealthController {
                     logger.debug(" orderNum#"+orderNum+" dwID#"+dwID+" amount#"+amount+" params#"+ LogUtil.toLogString(params));
                     //HashMap<String,String> extra=JSON.parseObject(attach, HashMap.class);
                     try {
-                        chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
+                        wealthService.getRechargeResponse(dwID,orderNum,amount);
                     } catch (Exception e) {
                         logger.error("",e);
                         return "fail";

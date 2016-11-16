@@ -6,10 +6,7 @@ import online.decentworld.charge.ChargeServiceTemplate;
 import online.decentworld.charge.service.IOrderService;
 import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.rdb.config.DBConfig;
-import online.decentworld.rdb.mapper.ConsumePriceMapper;
-import online.decentworld.rdb.mapper.OrderMapper;
-import online.decentworld.rdb.mapper.TransferHistoryMapper;
-import online.decentworld.rdb.mapper.WealthMapper;
+import online.decentworld.rdb.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
@@ -50,8 +47,8 @@ public class ApplicationRootConfig {
 	}
 
 	@Bean
-	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper,TransferHistoryMapper transferHistoryMapper){
-		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper,transferHistoryMapper);
+	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper,TransferHistoryMapper transferHistoryMapper,TipRecordsMapper tipRecordsMapper){
+		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper,transferHistoryMapper,tipRecordsMapper);
 	}
 
 
