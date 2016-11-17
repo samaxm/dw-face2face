@@ -8,9 +8,11 @@ import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.Jpush;
+import online.decentworld.face2face.tools.UserInforTransfer;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.entity.LikeRecord;
 import online.decentworld.rdb.entity.LikeRecordDetail;
+import online.decentworld.rdb.entity.LikeRecordKey;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
@@ -18,6 +20,7 @@ import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.rpc.dto.message.LikeMessageBody;
 import online.decentworld.rpc.dto.message.MessageWrapper;
+import online.decentworld.rpc.dto.message.Notice_LikeResponseMessageBody;
 import online.decentworld.rpc.dto.message.types.MessageType;
 import online.decentworld.tools.RandomUtil;
 import org.slf4j.Logger;
@@ -159,7 +162,42 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
+	public ListResultBean<LikeRecordDetail> getLikeRequests(String dwID) {
+		ListResultBean<LikeRecordDetail> list=new ListResultBean<LikeRecordDetail>();
+		List<LikeRecordDetail> records=likeMapper.getLikeRequest(dwID);
+		list.setStatusCode(SUCCESS);
+		list.setData(records);
+		return list;
+	}
+
+	@Override
 	public void removeMatch(String dwID, String name, String icon) {
 		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon));
+	}
+
+	@Override
+	public ResultBean acceptLikeRequest(String dwID, String likedID) {
+		likeMapper.acceptRequest(new LikeRecordKey(dwID,likedID));
+		pushNotice(dwID,likedID,true);
+		return ResultBean.SUCCESS;
+	}
+
+	@Override
+	public ResultBean refuseLikeRequest(String dwID, String likedID) {
+		likeMapper.deleteByPrimaryKey(new LikeRecordKey(dwID,likedID));
+		pushNotice(dwID,likedID,false);
+		return ResultBean.SUCCESS;
+	}
+
+
+	private void pushNotice(String dwID,String likedID,boolean accept){
+		try {
+			BaseDisplayUserInfo info=userInfoService.getUserInfo(likedID);
+			Notice_LikeResponseMessageBody body=new Notice_LikeResponseMessageBody(UserInforTransfer.transfer(info),accept);
+			MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper(likedID,dwID,body,0);
+			jpush.pushMessage(dwID,MessageType.NOTICE_LIKE_RESPONSE,JSON.toJSONString(messageWrapper));
+		}catch (Exception e){
+			logger.warn("[PUSh_LIKE_RESPONSE] dwID#"+dwID+" likedID#"+likedID+" accept#"+accept,e);
+		}
 	}
 }

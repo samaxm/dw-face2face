@@ -9,6 +9,31 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
 
+
+//        Configuration configuration= HBaseConfiguration.create();
+//        configuration.set("hbase.zookeeper.quorum","120.76.26.75:2080,112.74.29.115:2080,112.74.13.117:2080");
+//        configuration.set("hbase.zookeeper.property.clientPort","2080");
+//        Connection connection=null;
+//        try {
+//             connection= ConnectionFactory.createConnection(configuration);
+//            HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
+//            HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf("test"));
+////            tableDescriptor.addFamily(new HColumnDescriptor("records"));
+//            if (!admin.tableExists(TableName.valueOf("test"))) {
+////                admin.createTable(tableDescriptor);
+//                System.out.println("not found");
+//            }else{
+//                System.out.println("created");
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            if(connection!=null){
+//                connection.close();
+//            }
+//        }
+//        HTable t=new HTable(configuration,"test");
+//        System.out.println(Bytes.toString(t.getName().getName()));
+//        t.close();
 //      Cipher cipher = Cipher.getInstance("RSA");
 //      StringBuffer sb = new StringBuffer();
 //      StringBuffer sb2 = new StringBuffer();

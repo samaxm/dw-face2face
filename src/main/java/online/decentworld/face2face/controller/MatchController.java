@@ -37,19 +37,35 @@ public class MatchController {
 		return matchService.likeUser(dwID,likedID);
 	}
 
+	@RequestMapping("/like/requests")
+	@ResponseBody
+	public ResultBean likeRequest(@RequestParam String dwID){
+		return matchService.getLikeRequests(dwID);
+	}
+
 	@RequestMapping("/like/records")
 	@ResponseBody
 	public ResultBean likeRecords(@RequestParam String dwID){
 		return matchService.getLikeRecords(dwID);
 	}
 
+	@RequestMapping("/like/refuse")
+	@ResponseBody
+	public ResultBean refuseLike(@RequestParam String dwID,@RequestParam String likedID){
+		return matchService.refuseLikeRequest(dwID,likedID);
+	}
+
+	@RequestMapping("/like/accept")
+	@ResponseBody
+	public ResultBean acceptLike(@RequestParam String dwID,@RequestParam String likedID){
+		return matchService.acceptLikeRequest(dwID,likedID);
+	}
 //	@Frequency(limit=150,time=15000)
 	@RequestMapping("/getMatch/v2")
 	@ResponseBody
 	public ResultBean getMatchUserWithPriority(@RequestParam String dwID,@RequestParam String name,String icon,String sign,@RequestParam boolean isPrioritized,HttpServletRequest request){
 		return matchService.getMatchUserWithPriority(dwID,name,icon,sign,isPrioritized);
 	}
-
 
 //	@Frequency(limit=150,time=15000)
 	@RequestMapping("/remove")
