@@ -5,8 +5,6 @@ package online.decentworld.face2face.service.history;
  */
 public interface IMessageHistroyService {
 
-
-    public byte[] getHistroyMessage(String dwID,String contactID);
-
+    public byte[] getChatRecords(String fromID,String toID,int page);
 
 }

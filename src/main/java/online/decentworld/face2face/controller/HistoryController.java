@@ -24,7 +24,7 @@ public class HistoryController {
 
     @RequestMapping("/messages")
     public void getMessageHistroy(String dwID,String contactID,HttpServletResponse response){
-        byte[] data=messageHistroyService.getHistroyMessage(dwID,contactID);
+        byte[] data=messageHistroyService.getChatRecords(dwID,contactID,0);
         OutputStream outputStream=null;
         try{
             outputStream=response.getOutputStream();

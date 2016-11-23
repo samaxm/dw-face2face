@@ -7,6 +7,10 @@ import online.decentworld.charge.service.IOrderService;
 import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.rdb.config.DBConfig;
 import online.decentworld.rdb.mapper.*;
+import online.decentworld.rpc.codc.Codec;
+import online.decentworld.rpc.codc.MessageConverterFactory;
+import online.decentworld.rpc.codc.ReflectConverterFactory;
+import online.decentworld.rpc.codc.protos.SimpleProtosCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
@@ -50,14 +54,23 @@ public class ApplicationRootConfig {
 	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper,TransferHistoryMapper transferHistoryMapper,TipRecordsMapper tipRecordsMapper){
 		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper,transferHistoryMapper,tipRecordsMapper);
 	}
+	@Bean
+	public MessageConverterFactory codecFactory(){
+		return new ReflectConverterFactory();
+	}
 
+	@Bean
+	public Codec getCodec(MessageConverterFactory codecFactory){
+		SimpleProtosCodec codec= new SimpleProtosCodec();
+		codec.setConverterFactory(codecFactory);
+		return codec;
+	}
 
 //	@Bean
 //	public Sender getSender(){
-//		SimpleProtosCodec codec= new SimpleProtosCodec();
-//		codec.setConverterFactory(new ReflectConverterFactory());
-//		PooledActiveMQSender sender=new PooledActiveMQSender();
-//		sender.setCodec(codec);
-//		return sender;
+//
+////		PooledActiveMQSender sender=new PooledActiveMQSender();
+////		sender.setCodec(codec);
+////		return sender;
 //	}
 }

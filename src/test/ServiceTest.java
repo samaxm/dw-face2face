@@ -1,23 +1,16 @@
-import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.config.ApplicationRootConfig;
+import online.decentworld.face2face.service.history.IMessageHistroyService;
 import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.service.wealth.IWealthService;
-import online.decentworld.face2face.tools.UserInforTransfer;
-import online.decentworld.rdb.entity.BaseDisplayUserInfo;
-import online.decentworld.rdb.entity.LikeRecordDetail;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rdb.mapper.UserMapper;
-import online.decentworld.rpc.dto.message.MessageWrapper;
-import online.decentworld.rpc.dto.message.Notice_LikeResponseMessageBody;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.List;
 
 /**
  * Created by Sammax on 2016/9/26.
@@ -38,19 +31,15 @@ public class ServiceTest {
     private UserMapper ds;
     @Autowired
     private LikeRecordMapper mapper;
+    @Autowired
+    private IMessageHistroyService messageHistroyService;
 
     @Test
     public void test() throws Exception {
-//        LikeRecord record=new LikeRecord("0334631949","2419918324");
-//        mapper.insert(record);
-//            List<LikeRecordDetail> list=mapper.getLikeRequest("5338055984");
-//        System.out.println(JSON.toJSONString(list));
-        String dwID="0334631949";
-        String likedID="5338055984";
-        BaseDisplayUserInfo info=userInfoService.getUserInfo(likedID);
-        Notice_LikeResponseMessageBody body=new Notice_LikeResponseMessageBody(UserInforTransfer.transfer(info),true);
-        MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper(likedID,dwID,body,0);
-        System.out.println(JSON.toJSONString(messageWrapper));
+        messageHistroyService.getChatRecords("777","666",0);
+
+
+
 
 //        System.out.println(JSON.toJSONString(list));
 //        System.out.println(JSON.toJSONString(mapper.getLikeRecords("0334631949")));

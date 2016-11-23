@@ -21,25 +21,6 @@
 		<finalName>face2face</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.mybatis.generator</groupId>
-				<artifactId>mybatis-generator-maven-plugin</artifactId>
-				<version>1.3.2</version>
-				<configuration>
-					<configurationFile>src/main/java/online/decentworld/face2face/config/generatorConfig.xml</configurationFile>
-					<verbose>true</verbose>
-					<overwrite>false</overwrite>
-				</configuration>
-				<!-- <executions> <execution> <id>Generate MyBatis Artifacts</id> <goals> 
-					<goal>generate</goal> </goals> </execution> </executions> -->
-				<dependencies>
-					<dependency>
-						<groupId>org.mybatis.generator</groupId>
-						<artifactId>mybatis-generator-core</artifactId>
-						<version>1.3.2</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.8</source>
@@ -86,6 +67,25 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.12</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.flume</groupId>
+			<artifactId>flume-ng-core</artifactId>
+			<version>1.7.0</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>servlet-api</artifactId>
+					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.flume.flume-ng-clients</groupId>
+			<artifactId>flume-ng-log4jappender</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+
+
+
 
 		<!-- 文件上传 -->
 		<dependency>
@@ -247,10 +247,11 @@
 			<version>3.2.9</version>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jsp-2.1</artifactId>
 			<version>6.0.0</version>
-		</dependency>
+
+		</dependency>-->
 	</dependencies>
 </project>
