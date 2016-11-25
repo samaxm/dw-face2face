@@ -2,10 +2,14 @@ package online.decentworld.face2face.service.user.impl;
 
 import com.alibaba.fastjson.JSON;
 import online.decentworld.cache.redis.SessionCache;
+import online.decentworld.charge.ChargeService;
+import online.decentworld.charge.event.ChangeWorthEvent;
+import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.search.ISearchService;
+import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.tools.FastDFSClient;
@@ -39,6 +43,11 @@ public class UserInfoService implements IUserInfoService{
 	private ISearchService searchService;
 	@Autowired
 	private SessionCache sessionCache;
+	@Autowired
+	private IUserAuthorityService authorityService;
+	@Autowired
+	private ChargeService chargeService;
+
 
 	private static Logger logger=LoggerFactory.getLogger(UserInfoService.class);
 
@@ -129,12 +138,19 @@ public class UserInfoService implements IUserInfoService{
 		userMapper.setPayPassword(dwID,payPassword);
 	}
 
+	/**
+	 * filter all invalid field
+	 * @param user
+	 * @return
+	 */
 	public static User UserFieldFilter(User user){
 		user.setPassword(null);
+		user.setPayPassword(null);
 		user.setOpenid(null);
 		user.setUnionid(null);
 		user.setType(null);
 		user.setVersion(null);
+		user.setWorth(null);
 		return user;
 	}
 
@@ -146,6 +162,20 @@ public class UserInfoService implements IUserInfoService{
 			easemobApiUtil.resetPassword(user.getId(),password);
 		}
 
+	}
+
+	@Override
+	public ResultBean setWorth(String dwID, String paypassword, int worth) {
+		if(authorityService.checkPayPassword(dwID,paypassword)){
+			try {
+				ChargeReceipt receipt=chargeService.charge(new ChangeWorthEvent(worth, dwID));
+				return ObjectResultBean.SUCCESS(receipt.getChargeResult().getPayerWealth());
+			} catch (Exception e) {
+				return ResultBean.FAIL("修改身价失败！");
+			}
+		}else{
+			return ResultBean.FAIL("支付密码错误");
+		}
 	}
 
 }

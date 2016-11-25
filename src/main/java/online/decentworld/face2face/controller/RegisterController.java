@@ -1,11 +1,15 @@
 package online.decentworld.face2face.controller;
 
+import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.RegisterStrategyFactory;
+import online.decentworld.face2face.service.register.RegisterType;
+import online.decentworld.face2face.service.register.impl.VipRegisterService;
 import online.decentworld.face2face.service.sms.SMSService;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.IDUtil;
+import online.decentworld.tools.IPHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +33,6 @@ public class RegisterController {
     private RegisterStrategyFactory registerService;
     @Autowired
     private SMSService SMSservice;
-
-
 
     private static Logger logger= LoggerFactory.getLogger(RegisterController.class);
 
@@ -64,4 +66,34 @@ public class RegisterController {
         return SMSservice.sendPhoneCode(phoneNum, TokenType.BIND_PHONE, IDUtil.createRandomCode());
     }
 
+    @RequestMapping("/vip/code")
+    @ResponseBody
+    public ResultBean checkVIPCode(@RequestParam String vipCode){
+
+        return getVipRegisterService().checkVipCode(vipCode);
+
+    }
+
+
+    @RequestMapping("/vip/pay")
+    @ResponseBody
+     public ResultBean pay4Vip(HttpServletRequest request,@RequestParam String dwID,@RequestParam String vipCode,@RequestParam int channel){
+        try {
+            PayChannel payChannel=PayChannel.getChannel(channel);
+            String ip= IPHelper.getLocalIP(request);
+            if(ip.equals("0:0:0:0:0:0:0:1")){
+                ip="127.74.13.117";
+            }
+            return getVipRegisterService().createVipOrder(payChannel, dwID, ip, vipCode);
+        }catch (IllegalArgumentException e){
+            logger.debug("[ERROR_PAY_CHANNEL] #"+channel);
+            return ResultBean.FAIL("不支持的支付方式");
+        }
+    }
+
+
+
+    private VipRegisterService getVipRegisterService(){
+        return (VipRegisterService)registerService.getService(RegisterType.VIP.name());
+    }
 }

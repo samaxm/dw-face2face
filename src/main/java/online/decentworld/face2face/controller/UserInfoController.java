@@ -72,6 +72,19 @@ public class UserInfoController {
 		}
 	}
 
+	@RequestMapping("/set/worth")
+	@ResponseBody
+	public ResultBean setWorth(@RequestParam String dwID,@RequestParam String paypassword,@RequestParam int worth){
+		if(worth<1){
+			return ObjectResultBean.FAIL("身价必须大于1");
+		}
+		try{
+			return userService.setWorth(dwID,paypassword,worth);
+		}catch (Exception e){
+			return ObjectResultBean.FAIL("设置身价失败");
+		}
+	}
+
 
 	@RequestMapping("/set/info")
 	@ResponseBody

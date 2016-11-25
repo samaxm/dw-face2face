@@ -27,7 +27,7 @@
      function loadData(hour){
          count=hour*60;
          $.ajax({
-             url: "http://dev.service.dawan.online/face2face/view/chats.html/face2face/app/onlineStatus?count="+count,
+             url: "http://dev.service.dawan.online/face2face/app/onlineStatus?count="+count,
              dataType:"json",
              success: function(data){
                  var maxOnline=data.data.maxOnline;

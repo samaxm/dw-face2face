@@ -2,16 +2,15 @@ package online.decentworld.face2face.service.app.impl;
 
 import online.decentworld.cache.redis.ApplicationInfoCache;
 import online.decentworld.cache.redis.SessionCache;
-import online.decentworld.charge.ChargeService;
 import online.decentworld.charge.exception.IllegalChargeException;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.app.OnlineStatusDB;
+import online.decentworld.face2face.tools.Jpush;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.mapper.AppVersionMapper;
-import online.decentworld.rdb.mapper.OrderMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -35,9 +34,7 @@ public class AppService implements IAppService{
 	@Autowired
 	private SessionCache sessionCache;
 	@Autowired
-	private OrderMapper orderMapper;
-	@Autowired
-	private ChargeService chargeService;
+	private Jpush jpush;
 
 
 	private static Logger logger= LoggerFactory.getLogger(AppService.class);
@@ -49,10 +46,22 @@ public class AppService implements IAppService{
 	@PostConstruct
 	public void startTimer(){
 		new Timer().schedule(new TimerTask() {
+
+			private boolean isZero=false;
+
 			@Override
 			public void run() {
 				try {
 					long currentOnline=applicationInfoCache.checkOnline();
+					if(currentOnline==0){
+						isZero=true;
+					}else{
+						if(isZero==true){
+							//new user coming
+							jpush.pushOnlineNotice();
+							isZero=false;
+						}
+					}
 					OnlineStatusDB.storeCurrentOnlineNum(currentOnline);
 				}catch (Exception e){
 					logger.debug("",e);

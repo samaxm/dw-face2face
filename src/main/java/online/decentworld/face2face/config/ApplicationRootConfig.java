@@ -1,12 +1,10 @@
 package online.decentworld.face2face.config;
 
 import online.decentworld.cache.config.CacheBeanConfig;
-import online.decentworld.charge.ChargeService;
-import online.decentworld.charge.ChargeServiceTemplate;
 import online.decentworld.charge.service.IOrderService;
 import online.decentworld.charge.service.spi.OrderService;
 import online.decentworld.rdb.config.DBConfig;
-import online.decentworld.rdb.mapper.*;
+import online.decentworld.rdb.mapper.OrderMapper;
 import online.decentworld.rpc.codc.Codec;
 import online.decentworld.rpc.codc.MessageConverterFactory;
 import online.decentworld.rpc.codc.ReflectConverterFactory;
@@ -26,11 +24,11 @@ import javax.sql.DataSource;
  * @author Sammax
  */
 @Configuration
-@ComponentScan(basePackages={"online.decentworld.face2face.*"},excludeFilters={
+@ComponentScan(basePackages={"online.decentworld.*"},excludeFilters={
 		@Filter(type=FilterType.ANNOTATION,value=EnableWebMvc.class)
 })
 @EnableTransactionManagement
-@Import(value = {DBConfig.class,CacheBeanConfig.class})
+@Import( value = {DBConfig.class,CacheBeanConfig.class})
 public class ApplicationRootConfig {
 	
 	@SuppressWarnings("unused")
@@ -48,11 +46,6 @@ public class ApplicationRootConfig {
 		OrderService orderService=new OrderService();
 		orderService.setOrderMapper(orderMapper);
 		return orderService;
-	}
-
-	@Bean
-	public ChargeService getChargeService(WealthMapper wealthMapper,ConsumePriceMapper consumePriceMapper,OrderMapper orderMapper,TransferHistoryMapper transferHistoryMapper,TipRecordsMapper tipRecordsMapper){
-		return ChargeServiceTemplate.defaultService(wealthMapper,consumePriceMapper,orderMapper,transferHistoryMapper,tipRecordsMapper);
 	}
 	@Bean
 	public MessageConverterFactory codecFactory(){

@@ -19,6 +19,9 @@ public class RegisterStrategyFactory {
 	private IRegisterService userInfoEasemobRegisterService;
 	@Resource(name="phoneCodeRegisterService")
 	private IRegisterService phoneCodeRegisterService;
+	@Resource(name="vipRegisterService")
+	private IRegisterService vipRegisterService;
+
 
 	public IRegisterService getService(String registerType){
 		RegisterType type=RegisterType.valueOf(registerType);
@@ -28,6 +31,8 @@ public class RegisterStrategyFactory {
 			return userInfoEasemobRegisterService;
 		}else if(type==RegisterType.PHONECODE) {
 			return phoneCodeRegisterService;
+		}else if(type==RegisterType.VIP){
+			return vipRegisterService;
 		}else{
 			return null;
 		}

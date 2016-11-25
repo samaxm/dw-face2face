@@ -9,12 +9,15 @@ import online.decentworld.charge.event.TransferEvent;
 import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.receipt.PlainChargeReceipt;
 import online.decentworld.charge.service.*;
+import online.decentworld.face2face.service.register.IRegisterService;
+import online.decentworld.face2face.service.register.impl.VipRegisterService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.service.wealth.IWealthService;
 import online.decentworld.face2face.tools.Jpush;
 import online.decentworld.face2face.tools.UserInforTransfer;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.entity.Order;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.entity.Wealth;
 import online.decentworld.rdb.mapper.UserMapper;
@@ -33,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 
 /**
@@ -54,6 +58,10 @@ public class WealthService implements IWealthService {
     private Jpush jpush;
     @Autowired
     private IUserInfoService userInfoService;
+    @Resource(name = "vipRegisterService")
+    private IRegisterService vipRegisterService;
+
+    private static String RECHRGE_USER_NOTIFICATION="大我用户充值";
 
     private static Logger logger= LoggerFactory.getLogger(WealthService.class);
 
@@ -145,25 +153,37 @@ public class WealthService implements IWealthService {
     }
 
     @Override
+
     public ResultBean getRechargeResponse(String dwID, String orderNum, int amount) throws Exception {
 
-        chargeService.charge(new RechargeEvent(dwID,amount,orderNum));
-        try {
-            //push message
-            Notice_RechargeMessageBody rechargeMessageBody=new Notice_RechargeMessageBody(dwID,amount);
-            MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper("",dwID,rechargeMessageBody,0);
-            jpush.pushMessage(dwID, MessageType.NOTICE_RECHARGE, JSON.toJSONString(messageWrapper));
-        }catch (Exception e){
-            logger.warn("[PUSH_RECHARGE_NOTICE_FAIL] dwID#"+dwID+" orderNum#"+orderNum+" amount#"+amount,e);
+        Order order=orderService.getOrder(orderNum);
+        if(order.getType()==OrderType.RECHARGE.getValue()) {
+            //user recharge logic
+            chargeService.charge(new RechargeEvent(dwID, amount, orderNum));
+            try {
+                //push message
+                Notice_RechargeMessageBody rechargeMessageBody = new Notice_RechargeMessageBody(dwID, amount);
+                MessageWrapper messageWrapper = MessageWrapper.createMessageWrapper("", dwID, rechargeMessageBody, 0);
+                jpush.pushMessage(dwID, MessageType.NOTICE_RECHARGE, JSON.toJSONString(messageWrapper));
+            } catch (Exception e) {
+                logger.warn("[PUSH_RECHARGE_NOTICE_FAIL] dwID#" + dwID + " orderNum#" + orderNum + " amount#" + amount, e);
+            }
+            return ResultBean.SUCCESS;
+        }else if(order.getType()==OrderType.VIP_REGISTER.getValue()){
+            if(order.getIsPaid()!=null){
+                //user vip register logic
+                ((VipRegisterService)vipRegisterService).getVipRegisterOrderResponse(order);
+            }
+            return ResultBean.SUCCESS;
         }
-        return ResultBean.SUCCESS;
+        return ResultBean.FAIL("invalid order");
     }
 
 
     @Override
     public ResultBean recharge(String dwID, PayChannel channel, int amount,String ip) {
         try {
-            OrderReceipt receipt=orderService.createOrder(channel, amount, dwID, OrderType.RECHARGE, null, ip);
+            OrderReceipt receipt=orderService.createOrder(channel, amount, dwID, OrderType.RECHARGE, null, ip,RECHRGE_USER_NOTIFICATION);
             return ObjectResultBean.SUCCESS(receipt.getRequestData());
         } catch (Exception e) {
             return ResultBean.FAIL("创建订单失败，请重试!");
