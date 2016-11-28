@@ -53,8 +53,8 @@ public class AppController {
 
 	@RequestMapping("/onlineStatus")
 	@ResponseBody
-	public ResultBean getOnlineNum(@RequestParam int count){
-		return appService.getOnlineStatus(count);
+	public ResultBean getOnlineNum(@RequestParam String fromtime,@RequestParam String totime){
+		return appService.getOnlineStatus(fromtime,totime);
 	}
 
 

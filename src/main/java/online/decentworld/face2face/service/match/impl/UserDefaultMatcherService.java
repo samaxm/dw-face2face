@@ -18,8 +18,8 @@ import online.decentworld.rpc.dto.api.ListResultBean;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-import online.decentworld.rpc.dto.message.LikeMessageBody;
 import online.decentworld.rpc.dto.message.MessageWrapper;
+import online.decentworld.rpc.dto.message.Notice_LikeMessageBody;
 import online.decentworld.rpc.dto.message.Notice_LikeResponseMessageBody;
 import online.decentworld.rpc.dto.message.types.MessageType;
 import online.decentworld.tools.RandomUtil;
@@ -136,7 +136,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 			likeMapper.insertSelective(record);
 			try {
 				BaseDisplayUserInfo info=userInfoService.getUserInfo(dwID);
-				LikeMessageBody likeMessageBody=new LikeMessageBody(info.getIcon(),info.getName(),info.getDwID(),likedID,String.valueOf(info.getSex()));
+				Notice_LikeMessageBody likeMessageBody=new Notice_LikeMessageBody(info.getIcon(),info.getName(),info.getDwID(),likedID,String.valueOf(info.getSex()));
 				MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper(dwID,likedID,likeMessageBody,0);
 				jpush.pushMessage(likedID, MessageType.NOTICE_LIKE,JSON.toJSONString(messageWrapper));
 			}catch (Exception e){

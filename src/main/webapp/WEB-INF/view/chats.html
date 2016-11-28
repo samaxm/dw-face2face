@@ -10,113 +10,148 @@
     <meta http-equiv="expires" content="0">
 </header>
 <body>
-    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
-    <div id="main" style="width: 1000px;height: 800px;"></div>
-    <button id="1hour">1小时内数据</button>
-    <button id="6hour">6小时内数据</button>
-    <button id="12hour">12小时内数据</button>
-    <button id="18hour">18小时内数据</button>
-    <button id="24hour">24小时内数据</button>
-    <button id="1week">1周内数据</button>
-    <button id="1month">1月内数据</button>
+<!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+<div id="main" style="width: 1000px;height: 800px;"></div>
+<button id="1hour">1小时内数据</button>
+<button id="6hour">6小时内数据</button>
+<button id="12hour">12小时内数据</button>
+<button id="18hour">18小时内数据</button>
+<button id="24hour">24小时内数据</button>
+<button id="1week">1周内数据</button>
+<button id="1month">1月内数据</button>
+<br/>
+<span>起始时间（yyyyMMddHH）</span><input type="text" id="from"/><span>结束时间（yyyyMMddHH）</span><input id="to" type="text"/><button id="search">查询</button>
 </body>
- <script type="text/javascript">
+<script type="text/javascript">
 
+    function append0(num){
+        if(num<10){
+            return "0"+num;
+        }else{
+            return ""+num;
+        }
+    }
 
+    function getTimeString(date){
+        day = append0(date.getDate());
+        month = append0(date.getMonth()+1);
+        year = append0(date.getFullYear());
+        hour=append0(date.getHours());
+        totime=year+month+day+hour;
+        return totime;
+    }
 
-     function loadData(hour){
-         count=hour*60;
-         $.ajax({
-             url: "http://dev.service.dawan.online/face2face/app/onlineStatus?count="+count,
-             dataType:"json",
-             success: function(data){
-                 var maxOnline=data.data.maxOnline;
-                 var statuses=data.data.statusList;
-                 var time=new Array();
-                 var num=new Array();
-                 for(x in statuses){
-                     var status=statuses[x];
-                     var date=new Date();
-                     date.setTime(status.time);
-                     var hour=date.getHours();
-                     var min=date.getMinutes();
-                     if(min>=10){
-                         min=min+"";
-                     }else{
-                         min="0"+min;
-                     }
-                     time.push(hour+":"+min);
-                     num.push(status.onlineNum);
-                 }
-                 // list=data;
-                 // var ids=new Array();
-                 // var inMessage=new Array();
-                 // var outMessage=new Array();
-                 // for(x in list){
-                 //  var records=list[x];
-                 //  ids.push(records.user.showName);
-                 //  inMessage.push(records.totalIN);
-                 //  outMessage.push(records.totalOUT);
-                 // }
-                 // 基于准备好的dom，初始化echarts实例
-                 var myChart = echarts.init(document.getElementById('main'));
+    function searchFromNow(hourago){
+        totime=new Date();
+        fromtime=new Date(totime.getTime()-hourago*60*60*1000);
+        toTimeString=getTimeString(totime);
+        fromtimeString=getTimeString(fromtime);
+        loadData(fromtimeString,toTimeString);
+    }
+    function loadData(fromtime,totime){
+        $.ajax({
+            url: "http://localhost:7777/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
+//            url: "http://dev.service.dawan.online/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
+            dataType:"json",
+            success: function(data){
+                var maxOnline=data.data.maxOnline;
+                var statuses=data.data.statusList;
+                var time=new Array();
+                var num=new Array();
+                for(x in statuses){
+                    var status=statuses[x];
+                    var date=new Date();
+                    date.setTime(status.time);
+                    var hour=date.getHours();
+                    var min=date.getMinutes();
+                    if(min>=10){
+                        min=min+"";
+                    }else{
+                        min="0"+min;
+                    }
+                    time.push(hour+":"+min);
+                    num.push(status.onlineNum);
+                }
+                // list=data;
+                // var ids=new Array();
+                // var inMessage=new Array();
+                // var outMessage=new Array();
+                // for(x in list){
+                //  var records=list[x];
+                //  ids.push(records.user.showName);
+                //  inMessage.push(records.totalIN);
+                //  outMessage.push(records.totalOUT);
+                // }
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = echarts.init(document.getElementById('main'));
 
-                 // 指定图表的配置项和数据
-                 var option = {
-                     title: {
-                         text: '历史最高在线人数:'+maxOnline
-                     },
-                     tooltip: {
-                         trigger: 'axis'
-                     },
-                     legend: {
-                         data:['在线人数']
-                     },
+                // 指定图表的配置项和数据
+                var option = {
+                    title: {
+                        text: '历史最高在线人数:'+maxOnline
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:['在线人数']
+                    },
 
-                     xAxis: {
-                         type: 'category',
-                         boundaryGap: false,
-                         data:time
-                     },
-                     yAxis: {
-                         type: 'value'
-                     },
-                     series: [{
-                         name: '在线人数',
-                         type: 'line',
-                         smooth: true,
-                         data: num
-                     }]
-                 };
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data:time
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    dataZoom: [{
+                        type: 'slider',
+                        xAxisIndex: [0]
+                    }],
+                    series: [{
+                        name: '在线人数',
+                        type: 'line',
+                        smooth: true,
+                        data: num
+                    }]
+                };
 
-                 // 使用刚指定的配置项和数据显示图表。
-                 myChart.setOption(option);
-                 myChart.on('click',function(params){
-                     if (params.componentType === 'series') {
-                         alert(params.seriesType);
-                         alert(params.seriesIndex);
-                         alert(params.seriesName);
-                         alert(params.name);
-                         alert(params.dataIndex);
-                         alert(params.data);
-                     }
-                 })
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+                myChart.on('click',function(params){
+                    if (params.componentType === 'series') {
+                        alert(params.seriesType);
+                        alert(params.seriesIndex);
+                        alert(params.seriesName);
+                        alert(params.name);
+                        alert(params.dataIndex);
+                        alert(params.data);
+                    }
+                })
 
-             },
-             error:function(data){
-                 alert(data);
-             }
+            },
+            error:function(data){
+                alert(data);
+            }
 
-         })
-     }
-     $("#1hour").click(function(){loadData(1)});
-     $("#6hour").click(function(){loadData(6)});
-     $("#12hour").click(function(){loadData(12)});
-     $("#18hour").click(function(){loadData(18)});
-     $("#24hour").click(function(){loadData(24)});
-     $("#1week").click(function(){loadData(24*7)});
-     $("#1month").click(function(){loadData(24*30)});
-     $(document).ready(function(){loadData(1)});
+        })
+    }
+    $("#1hour").click(function(){searchFromNow(0)});
+    $("#6hour").click(function(){searchFromNow(6)});
+    $("#12hour").click(function(){searchFromNow(12)});
+    $("#18hour").click(function(){searchFromNow(18)});
+    $("#24hour").click(function(){searchFromNow(24)});
+    $("#1week").click(function(){searchFromNow(24*7)});
+    $("#1month").click(function(){searchFromNow(24*30)});
+    $("#search").click(function(){
+        from=$("#from").val();
+        to=$("#to").val();
+        alert(from);
+        alert(to);
+        loadData(from,to);
+    });
+    $(document).ready(function(){searchFromNow(0)});
 
-    </script>
+</script>
 </html>

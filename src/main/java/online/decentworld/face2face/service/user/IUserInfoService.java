@@ -59,7 +59,6 @@ public interface IUserInfoService {
 	@Transactional
 	public void setPassword(String phoneNum,String password) throws Exception;
 
-	@Transactional
 	public ResultBean setWorth(String dwID, String paypassword, int worth);
 
 

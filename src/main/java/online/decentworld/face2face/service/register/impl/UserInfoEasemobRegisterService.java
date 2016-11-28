@@ -1,17 +1,12 @@
 package online.decentworld.face2face.service.register.impl;
 
 import com.alibaba.fastjson.JSON;
-import online.decentworld.charge.service.TransferAccountType;
-import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
-import online.decentworld.face2face.common.RegisterChannel;
 import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
-import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.mapper.UserMapper;
-import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.IDUtil;
@@ -30,12 +25,7 @@ public class UserInfoEasemobRegisterService extends SaveNewUserService implement
     private static Logger logger= LoggerFactory.getLogger(UserInfoEasemobRegisterService.class);
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private EasemobApiUtil easemobAPI;
-    @Autowired
-    private WealthMapper wealthMapper;
-    @Autowired
-    private ISearchService searchService;
+
 
 
 
@@ -58,10 +48,7 @@ public class UserInfoEasemobRegisterService extends SaveNewUserService implement
                 user.setVersion(0);
                 user.setWorth(CommonProperties.DEFAULT_WORTH);
                 user.setInit(false);
-                if(RegisterChannel.WEIXIN.name().equals(user.getRegisterChannel())){
-                    user.setAccount(user.getOpenid());
-                    user.setAccountType(TransferAccountType.WXPAY.name());
-                }
+
                 try {
                     return ObjectResultBean.SUCCESS(saveUser(user));
                 }catch (RegisterFailException e){

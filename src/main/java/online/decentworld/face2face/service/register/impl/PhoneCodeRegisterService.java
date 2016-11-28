@@ -1,7 +1,6 @@
 package online.decentworld.face2face.service.register.impl;
 
 import com.alibaba.fastjson.JSON;
-import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.common.RegisterChannel;
 import online.decentworld.face2face.common.TokenType;
@@ -9,11 +8,9 @@ import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
 import online.decentworld.face2face.service.register.PhoneCodeRegisterInfo;
-import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
 import online.decentworld.rdb.entity.User;
 import online.decentworld.rdb.mapper.UserMapper;
-import online.decentworld.rdb.mapper.WealthMapper;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.AES;
@@ -33,13 +30,8 @@ public class PhoneCodeRegisterService extends SaveNewUserService implements IReg
     @Autowired
     private ITokenCheckService tokenService;
     @Autowired
-    private EasemobApiUtil easemobAPI;
-    @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private WealthMapper wealthMapper;
-    @Autowired
-    private ISearchService searchService;
+
 
     @Override
     public ResultBean register(String info)  {

@@ -3,9 +3,8 @@ package online.decentworld.face2face.controller;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.service.register.IRegisterService;
+import online.decentworld.face2face.service.register.IVipRegisterCheckService;
 import online.decentworld.face2face.service.register.RegisterStrategyFactory;
-import online.decentworld.face2face.service.register.RegisterType;
-import online.decentworld.face2face.service.register.impl.VipRegisterService;
 import online.decentworld.face2face.service.sms.SMSService;
 import online.decentworld.rpc.dto.api.ResultBean;
 import online.decentworld.tools.IDUtil;
@@ -33,6 +32,9 @@ public class RegisterController {
     private RegisterStrategyFactory registerService;
     @Autowired
     private SMSService SMSservice;
+    @Autowired
+    private IVipRegisterCheckService vipRegisterCheckService;
+
 
     private static Logger logger= LoggerFactory.getLogger(RegisterController.class);
 
@@ -69,9 +71,7 @@ public class RegisterController {
     @RequestMapping("/vip/code")
     @ResponseBody
     public ResultBean checkVIPCode(@RequestParam String vipCode){
-
-        return getVipRegisterService().checkVipCode(vipCode);
-
+        return vipRegisterCheckService.checkVipCode(vipCode);
     }
 
 
@@ -84,7 +84,7 @@ public class RegisterController {
             if(ip.equals("0:0:0:0:0:0:0:1")){
                 ip="127.74.13.117";
             }
-            return getVipRegisterService().createVipOrder(payChannel, dwID, ip, vipCode);
+            return vipRegisterCheckService.createVipOrder(payChannel, dwID, ip, vipCode);
         }catch (IllegalArgumentException e){
             logger.debug("[ERROR_PAY_CHANNEL] #"+channel);
             return ResultBean.FAIL("不支持的支付方式");
@@ -93,7 +93,5 @@ public class RegisterController {
 
 
 
-    private VipRegisterService getVipRegisterService(){
-        return (VipRegisterService)registerService.getService(RegisterType.VIP.name());
-    }
+
 }

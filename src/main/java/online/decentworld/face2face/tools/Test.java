@@ -7,6 +7,9 @@ import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by Sammax on 2016/9/26.
  */
@@ -14,16 +17,34 @@ public class Test {
 
     private static HelloWorld.Iface iface= new HelloWorldHandler();
 
-    private static HelloWorld.Processor processor=new HelloWorld.Processor(iface);
+    private static SimpleDateFormat format=new SimpleDateFormat("yyyyMMddHH");
+    private static String ONLINE_NUM_TABLE="ONLINE_NUM_TABLE_2016";
+    private static String COLUMN_FAMILY="ONLINENUM";
+
 
     public static void main(String[] args) throws Exception {
-        Runnable simple = new Runnable() {
-            @Override
-            public void run() {
-                simple(processor);
-            }
-        };
-        new Thread(simple).start();
+        Calendar calendar=Calendar.getInstance();
+        String rowkey=format.format(calendar.getTime());
+//        Result result=HbaseClient.instance().get(ONLINE_NUM_TABLE.getBytes(),rowkey.getBytes());
+//        System.out.println("returned ----->");
+//        NavigableMap<byte[], byte[]> familyMap =result.getFamilyMap(Bytes.toBytes(COLUMN_FAMILY));
+//        int counter = 0;
+//        String[] Quantifers = new String[familyMap.size()];
+//        String[] value=new String[familyMap.size()];
+//        for(byte[] bQunitifer : familyMap.keySet())
+//        {
+//            Quantifers[counter] = Bytes.toString(bQunitifer);
+//            value[counter]=Bytes.toString(familyMap.get(bQunitifer));
+//            counter++;
+//        }
+//
+//        for(int i=0;i<familyMap.size();i++){
+//            System.out.println(value[i]);
+//            System.out.println(Quantifers[i]);
+//        }
+//
+//        HbaseClient.instance().close();
+        System.out.println(rowkey);
     }
 
     public static void simple(HelloWorld.Processor processor){

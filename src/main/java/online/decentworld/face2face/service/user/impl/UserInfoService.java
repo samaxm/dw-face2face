@@ -8,6 +8,7 @@ import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.TokenType;
+import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
@@ -151,6 +152,7 @@ public class UserInfoService implements IUserInfoService{
 		user.setType(null);
 		user.setVersion(null);
 		user.setWorth(null);
+		user.setTag(null);
 		return user;
 	}
 
@@ -166,6 +168,10 @@ public class UserInfoService implements IUserInfoService{
 
 	@Override
 	public ResultBean setWorth(String dwID, String paypassword, int worth) {
+		String type=userMapper.getUserType(dwID);
+		if(!UserType.STAR.getName().equals(type)){
+			return ResultBean.FAIL("目前该功能仅对VIP用户开放");
+		}
 		if(authorityService.checkPayPassword(dwID,paypassword)){
 			try {
 				ChargeReceipt receipt=chargeService.charge(new ChangeWorthEvent(worth, dwID));

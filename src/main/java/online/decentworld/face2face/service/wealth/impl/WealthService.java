@@ -9,8 +9,7 @@ import online.decentworld.charge.event.TransferEvent;
 import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.receipt.PlainChargeReceipt;
 import online.decentworld.charge.service.*;
-import online.decentworld.face2face.service.register.IRegisterService;
-import online.decentworld.face2face.service.register.impl.VipRegisterService;
+import online.decentworld.face2face.service.register.IVipRegisterCheckService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.service.wealth.IWealthService;
@@ -59,7 +58,7 @@ public class WealthService implements IWealthService {
     @Autowired
     private IUserInfoService userInfoService;
     @Resource(name = "vipRegisterService")
-    private IRegisterService vipRegisterService;
+    private IVipRegisterCheckService vipRegisterService;
 
     private static String RECHRGE_USER_NOTIFICATION="大我用户充值";
 
@@ -170,9 +169,9 @@ public class WealthService implements IWealthService {
             }
             return ResultBean.SUCCESS;
         }else if(order.getType()==OrderType.VIP_REGISTER.getValue()){
-            if(order.getIsPaid()!=null){
+            if(!order.getIsPaid()){
                 //user vip register logic
-                ((VipRegisterService)vipRegisterService).getVipRegisterOrderResponse(order);
+                vipRegisterService.getVipRegisterOrderResponse(order);
             }
             return ResultBean.SUCCESS;
         }

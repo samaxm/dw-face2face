@@ -39,7 +39,9 @@ public class SolrUserInfoBean {
 
     public static SolrUserInfoBean convert(BaseDisplayUserInfo info){
         String sex;
-        if(info.getSex()==1){
+        if(info.getSex()==null){
+            sex="无";
+        }else if(info.getSex()==1){
             sex="男";
         }else if(info.getSex()==2){
             sex="女";

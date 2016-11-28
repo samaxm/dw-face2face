@@ -2,27 +2,29 @@ package online.decentworld.face2face.service.app.impl;
 
 import online.decentworld.cache.redis.ApplicationInfoCache;
 import online.decentworld.cache.redis.SessionCache;
-import online.decentworld.charge.exception.IllegalChargeException;
-import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
+import online.decentworld.face2face.service.app.OnlineStatus;
 import online.decentworld.face2face.service.app.OnlineStatusDB;
 import online.decentworld.face2face.tools.Jpush;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.hbase.HbaseClient;
 import online.decentworld.rdb.mapper.AppVersionMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class AppService implements IAppService{
@@ -35,7 +37,9 @@ public class AppService implements IAppService{
 	private SessionCache sessionCache;
 	@Autowired
 	private Jpush jpush;
-
+	private static SimpleDateFormat format=new SimpleDateFormat("yyyyMMddHHmm");
+	private static byte[] ONLINE_NUM_TABLE="ONLINE_NUM_TABLE_2016".getBytes();
+	private static byte[] COLUMN_FAMILY="ONLINENUM".getBytes();
 
 	private static Logger logger= LoggerFactory.getLogger(AppService.class);
 	private static int onlineCheckPeriod=60000;
@@ -102,17 +106,74 @@ public class AppService implements IAppService{
 	}
 
 	@Override
-	public ResultBean getOnlineStatus(int count) {
+	public ResultBean getOnlineStatus(String fromtime,String totime) {
 		MapResultBean bean=new MapResultBean<>();
 		bean.getData().put("maxOnline",applicationInfoCache.getMAX_ONLINE());
-		bean.getData().put("statusList",OnlineStatusDB.getOnlineStatuses(count));
+		bean.getData().put("statusList",queryOnlineStatus(fromtime,totime));
 		bean.setStatusCode(StatusCode.SUCCESS);
 		return  bean;
 	}
 
-	@Override
-	public String getRechargeResponse(String orderNum, PayChannel channel, int amount) throws IllegalChargeException {
 
-		return null;
+
+	private List<OnlineStatus> queryOnlineStatus(String fromtime,String totime){
+		/*
+			time pattern yyyyMMddHH row key of hbase
+		 */
+
+		List<OnlineStatus> onlineStatuses;
+		Result result= null;
+		try {
+			//query one hour data use get
+			if(fromtime.equals(totime)){
+				result = HbaseClient.instance().get(ONLINE_NUM_TABLE, fromtime.getBytes());
+				onlineStatuses=extractResult(result);
+			}else{
+				//scan
+				onlineStatuses=new LinkedList<>();
+				List<Result> data=HbaseClient.instance().scan(ONLINE_NUM_TABLE,null,fromtime.getBytes(),totime.getBytes());
+				data.forEach((Result r)->
+					onlineStatuses.addAll(extractResult(r))
+				);
+			}
+		return onlineStatuses;
+		} catch (Exception e) {
+			logger.warn("",e);
+			return null;
+		}
+	}
+
+	private List<OnlineStatus> extractResult(Result result){
+		List<OnlineStatus> onlineStatuses=new LinkedList<>();
+		NavigableMap<byte[], byte[]> familyMap =result.getFamilyMap(COLUMN_FAMILY);
+
+		if(familyMap==null){
+			return onlineStatuses;
+		}
+
+		int counter = 0;
+		String[] Quantifers = new String[familyMap.size()];
+		String[] value=new String[familyMap.size()];
+		String row=Bytes.toString(result.getRow());
+		for(byte[] bQunitifer : familyMap.keySet())
+		{
+			Quantifers[counter] = Bytes.toString(bQunitifer);
+			value[counter]=Bytes.toString(familyMap.get(bQunitifer));
+			counter++;
+		}
+		for(int i=0;i<familyMap.size();i++){
+			String min=Quantifers[i];
+			String num=value[i];
+			if (min.length()==1){
+				min="0"+min;
+			}
+			OnlineStatus status= null;
+			try {
+				status = new OnlineStatus(Long.parseLong(num),format.parse(row+min).getTime());
+			} catch (ParseException e) {
+			}
+			onlineStatuses.add(status);
+		}
+		return onlineStatuses;
 	}
 }

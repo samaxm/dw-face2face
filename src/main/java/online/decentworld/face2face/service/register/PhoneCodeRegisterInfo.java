@@ -4,10 +4,13 @@ package online.decentworld.face2face.service.register;
  * Created by Sammax on 2016/9/21.
  */
 public class PhoneCodeRegisterInfo {
+
     private String phoneNum;
     private String password;
     private String code;
-    public PhoneCodeRegisterInfo(){};
+
+    public PhoneCodeRegisterInfo(){}
+
     public PhoneCodeRegisterInfo(String phoneNum, String password, String code) {
         this.phoneNum = phoneNum;
         this.password = password;

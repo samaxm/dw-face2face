@@ -1,7 +1,9 @@
 package online.decentworld.face2face.service.register.impl;
 
+import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.common.CommonProperties;
+import online.decentworld.face2face.common.RegisterChannel;
 import online.decentworld.face2face.config.ConfigLoader;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.search.ISearchService;
@@ -37,6 +39,11 @@ public class SaveNewUserService {
         return user saved without password and secrete info
      */
     protected User saveUser(User user) throws Exception {
+        user.setWorth(1);
+        if(RegisterChannel.WEIXIN.name().equals(user.getRegisterChannel())){
+            user.setAccount(user.getOpenid());
+            user.setAccountType(TransferAccountType.WXPAY.name());
+        }
         if(checkField(user)){
 
             tryStoreUser(user);
