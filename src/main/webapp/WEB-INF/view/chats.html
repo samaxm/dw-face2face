@@ -62,14 +62,11 @@
                     var status=statuses[x];
                     var date=new Date();
                     date.setTime(status.time);
-                    var hour=date.getHours();
-                    var min=date.getMinutes();
-                    if(min>=10){
-                        min=min+"";
-                    }else{
-                        min="0"+min;
-                    }
-                    time.push(hour+":"+min);
+                    hour=append0(date.getHours());
+                    min=append0(date.getMinutes());
+                    day = append0(date.getDate());
+                    month = append0(date.getMonth()+1);
+                    time.push(month+"/"+day+" "+hour+":"+min);
                     num.push(status.onlineNum);
                 }
                 // list=data;

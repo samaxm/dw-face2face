@@ -36,4 +36,9 @@ public class WebCacheKey extends CacheKey {
 
     public static String MATCH_SET="MATCH:SET";
 
+
+    public static String VIP_MATCH_SET="vip_MATCH:SET";
+
+
+
 }

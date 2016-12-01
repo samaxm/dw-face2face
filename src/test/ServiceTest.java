@@ -1,5 +1,5 @@
-import online.decentworld.charge.charger.ChargeResult;
 import online.decentworld.charge.charger.DBCharger;
+import online.decentworld.charge.service.OrderType;
 import online.decentworld.face2face.config.ApplicationRootConfig;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.history.IMessageHistroyService;
@@ -9,12 +9,12 @@ import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
 import online.decentworld.face2face.service.wealth.IWealthService;
-import online.decentworld.rdb.entity.DBChargeResult;
+import online.decentworld.rdb.entity.Order;
 import online.decentworld.rdb.mapper.LikeRecordMapper;
 import online.decentworld.rdb.mapper.OrderMapper;
 import online.decentworld.rdb.mapper.UserMapper;
 import online.decentworld.rdb.mapper.WealthMapper;
-import online.decentworld.rpc.dto.api.ResultBean;
+import online.decentworld.tools.AES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +55,15 @@ public class ServiceTest {
     @Autowired
     private DBCharger dbCharger;
 
+
+
     @Test
     public void test() throws Exception {
-//        Thread.sleep(1000);
-        ResultBean result=userInfoService.setWorth("0215043174", "", 2);
-//        DBChargeResult result=wealthMapper.charge("0215043174", -2);
-//        ChargeResult result=dbCharger.charge("0215043174", -2);
-        System.out.println(result);
+        Order order=new Order();
+        order.setDwid("3390214868");
+        order.setExtra("IAIJ");
+        order.setType(OrderType.VIP_REGISTER.getValue());
+        vipRegisterCheckService.getVipRegisterOrderResponse(order);
 //        JSONObject jsonObject=new JSONObject();
 //        jsonObject.put("registerType","VIP");
 //

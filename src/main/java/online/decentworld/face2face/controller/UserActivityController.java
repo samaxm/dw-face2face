@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class UserActivityController {
 
-
     @Autowired
     private IAppService appService;
     @Autowired
@@ -45,7 +44,6 @@ public class UserActivityController {
     public ResultBean logout(String user){
         return null;
     }
-
 
     @RequestMapping("/ping")
     @ResponseBody

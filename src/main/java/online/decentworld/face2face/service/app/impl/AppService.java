@@ -5,8 +5,6 @@ import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.app.OnlineStatus;
-import online.decentworld.face2face.service.app.OnlineStatusDB;
-import online.decentworld.face2face.tools.Jpush;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.hbase.HbaseClient;
@@ -21,10 +19,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NavigableMap;
 
 @Service
 public class AppService implements IAppService{
@@ -35,46 +34,14 @@ public class AppService implements IAppService{
 	private ApplicationInfoCache applicationInfoCache;
 	@Autowired
 	private SessionCache sessionCache;
-	@Autowired
-	private Jpush jpush;
+
 	private static SimpleDateFormat format=new SimpleDateFormat("yyyyMMddHHmm");
 	private static byte[] ONLINE_NUM_TABLE="ONLINE_NUM_TABLE_2016".getBytes();
 	private static byte[] COLUMN_FAMILY="ONLINENUM".getBytes();
 
 	private static Logger logger= LoggerFactory.getLogger(AppService.class);
-	private static int onlineCheckPeriod=60000;
 	public AppService(){
-
 	}
-
-	@PostConstruct
-	public void startTimer(){
-		new Timer().schedule(new TimerTask() {
-
-			private boolean isZero=false;
-
-			@Override
-			public void run() {
-				try {
-					long currentOnline=applicationInfoCache.checkOnline();
-					if(currentOnline==0){
-						isZero=true;
-					}else{
-						if(isZero==true){
-							//new user coming
-							jpush.pushOnlineNotice();
-							isZero=false;
-						}
-					}
-					OnlineStatusDB.storeCurrentOnlineNum(currentOnline);
-				}catch (Exception e){
-					logger.debug("",e);
-				}
-
-			}
-		}, 10000, onlineCheckPeriod);
-	}
-
 
 	@Override
 	public ObjectResultBean checkVersion(String type) {

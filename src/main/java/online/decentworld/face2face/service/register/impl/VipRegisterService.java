@@ -192,7 +192,7 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
             return;
         }
         PartnerCode code=partnerCodeMapper.isCodeExist(order.getExtra());
-        if(!code.getDwid().equals(order.getDwid())||!code.getStatus().equals(PartnerCode.Status.CHECKED.name())){
+        if(code==null||!code.getDwid().equals(order.getDwid())||!code.getStatus().equals(PartnerCode.Status.CHECKED.name())){
             logger.warn("[Strange State] order#"+order.toString());
         }else{
             code.setStatus(PartnerCode.Status.PAID.name());
@@ -214,7 +214,7 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
             }
             calendar.set(Calendar.MONTH,month);
             records.setExpire(calendar.getTime());
-            records.setExp(30*100);
+            records.setExp(VipRecords.ONE_MONTH_EXP);
             //create user vip record
             vipRecordsMapper.insert(records);
             MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper("SYSTEM",order.getDwid(),new Notice_VipRegisterMessageBody(order.getDwid(),new Date()),0);

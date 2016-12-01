@@ -61,12 +61,12 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-core:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.2" />
           <element id="library" level="project" name="Maven: org.springframework:spring-context:4.3.2.RELEASE" />
-          <element id="library" level="project" name="Maven: org.springframework:spring-jdbc:4.3.2.RELEASE" />
-          <element id="library" level="project" name="Maven: org.springframework:spring-tx:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-beans:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-web:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-expression:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-orm:4.3.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-jdbc:4.3.2.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-tx:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-test:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-context-support:4.3.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework.data:spring-data-redis:1.7.2.RELEASE" />
@@ -128,9 +128,6 @@
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.1.26" />
           <element id="library" level="project" name="Maven: online.decentworld:charge:1.0" />
           <element id="library" level="project" name="Maven: cn.jpush.api:jpush-client:3.2.9" />
-          <element id="library" level="module" name="fastdfs_client_v1.24.jar" module-name="face2face" />
-          <element id="library" level="module" name="Maven: jdk.tools:jdk.tools:1.6" module-name="face2face" />
-          <element id="library" level="module" name="taobao-sdk-java-auto_1455552377940-20160414.jar" module-name="face2face" />
         </element>
       </element>
       <element id="directory" name="META-INF">

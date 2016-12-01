@@ -113,6 +113,7 @@ public class UserInfoService implements IUserInfoService{
 		}
 	}
 
+
 	@Override
 	public ResultBean bindAccount(String dwID,TransferAccountType accountType, String account) {
 		userMapper.bindAccount(account,accountType.name(),dwID);
@@ -182,6 +183,12 @@ public class UserInfoService implements IUserInfoService{
 		}else{
 			return ResultBean.FAIL("支付密码错误");
 		}
+	}
+
+	@Override
+	@CacheEvict(value="redis_online.decentworld.rdb.entity.BaseDisplayUserInfo" ,key="#user.id")
+	public void cleanUserInfoCache(String dwID) {
+
 	}
 
 }

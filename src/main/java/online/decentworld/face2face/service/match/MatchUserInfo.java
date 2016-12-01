@@ -14,6 +14,17 @@ public class MatchUserInfo {
 
 	private String sign;
 
+	private String tag;
+
+
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
 
 	public String getSign() {
 		return sign;
@@ -49,6 +60,15 @@ public class MatchUserInfo {
 
 	public MatchUserInfo(String dwID, String name, String icon,String sign) {
 		super();
+		this.dwID = dwID;
+		this.name = name;
+		this.icon = icon;
+		this.sign=sign;
+	}
+
+	public MatchUserInfo(String dwID, String name, String icon,String sign,String tag) {
+		super();
+		this.tag=tag;
 		this.dwID = dwID;
 		this.name = name;
 		this.icon = icon;

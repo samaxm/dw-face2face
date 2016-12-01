@@ -62,4 +62,5 @@ public interface IUserInfoService {
 	public ResultBean setWorth(String dwID, String paypassword, int worth);
 
 
+	public void cleanUserInfoCache(String dwID);
 }

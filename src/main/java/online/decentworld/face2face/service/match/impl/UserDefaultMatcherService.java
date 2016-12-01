@@ -3,6 +3,7 @@ package online.decentworld.face2face.service.match.impl;
 
 import com.alibaba.fastjson.JSON;
 import online.decentworld.face2face.cache.MatchQueueCache;
+import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.service.match.IUserMatcherService;
 import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.face2face.service.security.report.IReportService;
@@ -97,6 +98,35 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
+	public ResultBean getVipMatch(MatchUserInfo info) {
+		BaseDisplayUserInfo baseDisplayUserInfo=userInfoService.getUserInfo(info.getDwID());
+		if(baseDisplayUserInfo==null||baseDisplayUserInfo.getType().equals(UserType.STAR.getName())){
+			return ResultBean.FAIL("抱歉，您不是VIP用户");
+		}
+		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
+		if(reportService.isUserBlock(info.getDwID())){
+			bean.setStatusCode(FAILED);
+			bean.setMsg("抱歉，您被举报次数过多已被封号");
+		}else{
+			MatchUserInfo matched;
+			String matchUserInfo;
+			/**
+			 * set to true while user is not so many
+			 */
+			do{
+				matchUserInfo=matchCache.getVIPMatchUser(info);
+				if(matchUserInfo==null){
+					return ObjectResultBean.FAIL("搜索用户中...");
+				}
+				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);
+			}while (matched.getDwID().equals(info.getDwID()));
+			bean.setStatusCode(SUCCESS);
+			bean.getData().put("matchID", matched);
+		}
+		return bean;
+	}
+
+	@Override
 	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon,String sign, boolean isPrioritized) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
@@ -171,8 +201,17 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
-	public void removeMatch(String dwID, String name, String icon) {
-		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon));
+	public void removeMatch(String dwID, String name, String icon,String sign) {
+		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon,sign));
+	}
+
+	@Override
+	public void removeVIPMatch(MatchUserInfo info) {
+		BaseDisplayUserInfo baseDisplayUserInfo=userInfoService.getUserInfo(info.getDwID());
+		if(baseDisplayUserInfo==null||baseDisplayUserInfo.getType().equals(UserType.STAR.getName())){
+			return;
+		}
+		matchCache.getVIPMatchUser(info);
 	}
 
 	@Override

@@ -67,6 +67,35 @@ public class MatchQueueCache extends RedisTemplate {
 		return (String)result.getResult();
 	}
 
+
+	public String getVIPMatchUser(MatchUserInfo userInfo){
+		logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID());
+		String myinfo=JSON.toJSONString(userInfo);
+		ReturnResult result=cache((Jedis jedis)->{
+			jedis.srem(WebCacheKey.VIP_MATCH_SET,myinfo);
+			String info=jedis.spop(WebCacheKey.VIP_MATCH_SET);
+//			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
+			if(info!=null){
+				return result(info);
+			}else{
+				//需要将用户加入等待队列
+//				jedis.rpush(WebCacheKey.MATCH_QUEUE_KEY(index), JSON.toJSONString(userInfo));
+				jedis.sadd(WebCacheKey.VIP_MATCH_SET,myinfo);
+				return ReturnResult.SUCCESS;
+			}
+		});
+		return (String)result.getResult();
+	}
+
+	public void removeVIPMatchUser(MatchUserInfo userInfo){
+		logger.debug("[REMOVE_MATCH] dwID#"+userInfo.getDwID());
+		cache((Jedis jedis)->{
+			jedis.srem(WebCacheKey.VIP_MATCH_SET,JSON.toJSONString(userInfo));
+			return ReturnResult.SUCCESS;
+		});
+	}
+
+
 	public void removeMatchUser(MatchUserInfo userInfo){
 		logger.debug("[REMOVE_MATCH] dwID#"+userInfo.getDwID());
 		cache((Jedis jedis)->{

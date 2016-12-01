@@ -9,6 +9,7 @@
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../charge/src/main/java" />
       <root url="file://$PROJECT_DIR$/../charge/src/test" />
+      <root url="jar://$MAVEN_REPOSITORY$/online/decentworld/charge/1.0/charge-1.0-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

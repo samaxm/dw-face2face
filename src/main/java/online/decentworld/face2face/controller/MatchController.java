@@ -2,6 +2,7 @@ package online.decentworld.face2face.controller;
 
 import online.decentworld.face2face.annotation.Frequency;
 import online.decentworld.face2face.service.match.IUserMatcherService;
+import online.decentworld.face2face.service.match.MatchUserInfo;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,11 +68,26 @@ public class MatchController {
 		return matchService.getMatchUserWithPriority(dwID,name,icon,sign,isPrioritized);
 	}
 
+
+	@RequestMapping("/getMatch/vip")
+	@ResponseBody
+	public ResultBean getMatchVipUser(@RequestParam String dwID,@RequestParam String name,String icon,String sign,String tag){
+		MatchUserInfo info=new MatchUserInfo(dwID,name,icon,sign,tag);
+		return matchService.getVipMatch(info);
+	}
+
 //	@Frequency(limit=150,time=15000)
 	@RequestMapping("/remove")
 	@ResponseBody
-	public ResultBean remove(@RequestParam String dwID,@RequestParam String name,String icon,@RequestParam boolean isPrioritized,HttpServletRequest request){
-		matchService.removeMatch(dwID, name, icon);
+	public ResultBean remove(@RequestParam String dwID,@RequestParam String name,String icon,String sign,@RequestParam boolean isPrioritized,HttpServletRequest request){
+		matchService.removeMatch(dwID, name, icon,sign);
+		return ObjectResultBean.SUCCESS;
+	}
+
+	@RequestMapping("/remove/vip")
+	@ResponseBody
+	public ResultBean removeVip(@RequestParam String dwID,@RequestParam String name,String icon,String sign,String tag,HttpServletRequest request){
+		matchService.removeVIPMatch(new MatchUserInfo(dwID,name,icon, sign,tag));
 		return ObjectResultBean.SUCCESS;
 	}
 }
