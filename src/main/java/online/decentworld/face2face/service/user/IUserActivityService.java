@@ -9,4 +9,6 @@ import online.decentworld.rpc.dto.api.ResultBean;
 public interface IUserActivityService {
 
     ResultBean login(String account,AccountType accountType,String password);
+
+    ResultBean loginWithVipInfo(String account,AccountType accountType,String password);
 }

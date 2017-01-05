@@ -134,6 +134,6 @@ public class FastDFSClient implements FileManagerConfig{
 	}
 
 	public static void main(String[] args) {
-		deleteByFullName("http://dev.service.dawan.online//group1/M00/00/12/cEodc1ftBdSASWZfAABxeKsD33E118.jpg");
+		deleteByFullName("http://www.sxyusx.com/group1/M00/00/12/cEodc1ftBdSASWZfAABxeKsD33E118.jpg");
 	}
 }

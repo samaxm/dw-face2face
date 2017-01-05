@@ -22,11 +22,21 @@ public class SolrUserInfoBean {
     @Field
     private String icon;
     @Field
+    private String realname;
+    @Field
+    private String company;
+    @Field
+    private String title;
+    @Field
+    private String star;
+    @Field
+    private String age;
+    @Field
     private String type;
 
     public SolrUserInfoBean(){}
 
-    public SolrUserInfoBean(String name, String area, String sex, String sign, String id, String worth, String icon, String type) {
+    public SolrUserInfoBean(String name, String area, String sex, String sign, String id, String worth, String icon, String realname, String company, String title, String star, String age, String type) {
         this.name = name;
         this.area = area;
         this.sex = sex;
@@ -34,6 +44,11 @@ public class SolrUserInfoBean {
         this.id = id;
         this.worth = worth;
         this.icon = icon;
+        this.realname = realname;
+        this.company = company;
+        this.title = title;
+        this.star = star;
+        this.age = age;
         this.type = type;
     }
 
@@ -49,7 +64,7 @@ public class SolrUserInfoBean {
             sex="无";
         }
         return new SolrUserInfoBean(info.getName(),info.getArea(),sex,info.getSign(),info.getDwID(),String.valueOf(info.getWorth())
-                ,info.getIcon(),info.getType());
+                ,info.getIcon(),info.getRealname(),info.getCompany(),info.getTitle(),info.getStar(),info.getAge(),info.getType());
     }
 
 
@@ -115,5 +130,45 @@ public class SolrUserInfoBean {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getStar() {
+        return star;
+    }
+
+    public void setStar(String star) {
+        this.star = star;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
     }
 }

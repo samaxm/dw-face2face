@@ -122,29 +122,30 @@ public class WealthService implements IWealthService {
     }
 
     @Override
-    public ResultBean tip(String dwID, String pay_password,String tipedID, int amount) {
+    public ResultBean tip(String dwID,String tipedID, int amount) {
         TipEvent tipEvent=new TipEvent(dwID,tipedID,amount);
         try{
-            if(userAuthorityService.checkPayPassword(dwID,pay_password)){
-                PlainChargeReceipt receipt= (PlainChargeReceipt) chargeService.charge(tipEvent);
-                int payerWealth=receipt.getChargeResult().getPayerWealth();
+            PlainChargeReceipt receipt= (PlainChargeReceipt) chargeService.charge(tipEvent);
+            if(receipt.getChargeResult().getStatusCode()==ChargeResultCode.SUCCESS) {
+                int payerWealth = receipt.getChargeResult().getPayerWealth();
                 try {
                     //push message
-                    BaseDisplayUserInfo info=userInfoService.getUserInfo(dwID);
-                    Notice_TipMessageBody tipMessageBody=new Notice_TipMessageBody(UserInforTransfer.transfer(info),amount,new Date());
-                    MessageWrapper messageWrapper=MessageWrapper.createMessageWrapper(dwID,tipedID,tipMessageBody,0);
+                    BaseDisplayUserInfo info = userInfoService.getUserInfo(dwID);
+                    Notice_TipMessageBody tipMessageBody = new Notice_TipMessageBody(UserInforTransfer.transfer(info), amount, new Date());
+                    MessageWrapper messageWrapper = MessageWrapper.createMessageWrapper(dwID, tipedID, tipMessageBody, 0);
                     jpush.pushMessage(tipedID, MessageType.NOTICE_TIP, JSON.toJSONString(messageWrapper));
-                }catch (Exception e){
-                    logger.warn("[PUSH_TIP_NOTICE_FAIL] dwID#"+dwID+" tipedID#"+tipedID+" amount#"+amount,e);
+                } catch (Exception e) {
+                    logger.warn("[PUSH_TIP_NOTICE_FAIL] dwID#" + dwID + " tipedID#" + tipedID + " amount#" + amount, e);
                 }
-                MapResultBean<String,Integer> resultBean=new MapResultBean<>();
-                resultBean.getData().put("wealth",payerWealth);
+                MapResultBean<String, Integer> resultBean = new MapResultBean<>();
+                resultBean.getData().put("wealth", payerWealth);
                 resultBean.setStatusCode(StatusCode.SUCCESS);
                 return resultBean;
+            }else if(receipt.getChargeResult().getStatusCode()==ChargeResultCode.WEALTH_LACK){
+                return ResultBean.FAIL("金额不足");
             }else{
-                return ResultBean.FAIL("支付密码错误");
+                return ResultBean.FAIL("打赏失败");
             }
-
         }catch (Exception e){
             logger.warn("[TIP_FAIL] dwID#"+dwID+" tipedID#"+tipedID+" amount#"+amount,e);
             return ObjectResultBean.FAIL("打赏失败，请稍后再试");
@@ -156,7 +157,7 @@ public class WealthService implements IWealthService {
     public ResultBean getRechargeResponse(String dwID, String orderNum, int amount) throws Exception {
 
         Order order=orderService.getOrder(orderNum);
-        if(order.getType()==OrderType.RECHARGE.getValue()) {
+        if(order.getType()==OrderType.RECHARGE.getValue()||!order.getIsPaid()) {
             //user recharge logic
             chargeService.charge(new RechargeEvent(dwID, amount, orderNum));
             try {

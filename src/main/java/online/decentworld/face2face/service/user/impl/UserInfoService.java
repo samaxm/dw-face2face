@@ -2,11 +2,13 @@ package online.decentworld.face2face.service.user.impl;
 
 import com.alibaba.fastjson.JSON;
 import online.decentworld.cache.redis.SessionCache;
+import online.decentworld.charge.ChargeResultCode;
 import online.decentworld.charge.ChargeService;
 import online.decentworld.charge.event.ChangeWorthEvent;
 import online.decentworld.charge.receipt.ChargeReceipt;
 import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
+import online.decentworld.face2face.cache.UserInfoCache;
 import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.service.search.ISearchService;
@@ -48,7 +50,8 @@ public class UserInfoService implements IUserInfoService{
 	private IUserAuthorityService authorityService;
 	@Autowired
 	private ChargeService chargeService;
-
+	@Autowired
+	private UserInfoCache userInfoCache;
 
 	private static Logger logger=LoggerFactory.getLogger(UserInfoService.class);
 
@@ -97,10 +100,9 @@ public class UserInfoService implements IUserInfoService{
 				if(password.equals(u.getPassword())){
 					user=UserFieldFilter(user);
 					userMapper.updateByPrimaryKeySelective(user);
-					if(u.getIcon()!=null&&!u.getIcon().equals("")){
+					if(user.getIcon()!=null&&u.getIcon()!=null&&!u.getIcon().equals("")){
 						FastDFSClient.deleteByFullName(u.getIcon());
 					}
-
 					searchService.saveOrUpdateIndex(user);
 					return ObjectResultBean.SUCCESS(user);
 				}else{
@@ -164,7 +166,6 @@ public class UserInfoService implements IUserInfoService{
 			userMapper.resetPassword(phoneNum,password);
 			easemobApiUtil.resetPassword(user.getId(),password);
 		}
-
 	}
 
 	@Override
@@ -176,8 +177,15 @@ public class UserInfoService implements IUserInfoService{
 		if(authorityService.checkPayPassword(dwID,paypassword)){
 			try {
 				ChargeReceipt receipt=chargeService.charge(new ChangeWorthEvent(worth, dwID));
-				return ObjectResultBean.SUCCESS(receipt.getChargeResult().getPayerWealth());
+				if(receipt.getChargeResult().getStatusCode()== ChargeResultCode.SUCCESS) {
+					return ObjectResultBean.SUCCESS(receipt.getChargeResult().getPayerWealth());
+				}else if(receipt.getChargeResult().getStatusCode()== ChargeResultCode.WEALTH_LACK){
+					return ResultBean.FAIL("修改身价失败！您的身家不足，修改身价需要扣除对应身家");
+				}else{
+					return ResultBean.FAIL("修改身价失败！");
+				}
 			} catch (Exception e) {
+				logger.warn("",e);
 				return ResultBean.FAIL("修改身价失败！");
 			}
 		}else{
@@ -189,6 +197,11 @@ public class UserInfoService implements IUserInfoService{
 	@CacheEvict(value="redis_online.decentworld.rdb.entity.BaseDisplayUserInfo" ,key="#user.id")
 	public void cleanUserInfoCache(String dwID) {
 
+	}
+
+	@Override
+	public ResultBean getUserTags() {
+		return ObjectResultBean.SUCCESS(userInfoCache.getUserTags());
 	}
 
 }

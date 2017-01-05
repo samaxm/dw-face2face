@@ -39,6 +39,20 @@ public class UserActivityController {
         }
     }
 
+    @RequestMapping("/login/v2")
+    @ResponseBody
+    public ResultBean loginV2(@RequestParam String account,@RequestParam String password,@RequestParam String accountType){
+        try {
+            AccountType type=AccountType.valueOf(accountType.toUpperCase());
+            return userActivityService.loginWithVipInfo(account,type,password);
+        }catch (IllegalArgumentException e){
+            logger.debug("[ERROR_ACCOUNT_TYPE] #"+accountType);
+            return ResultBean.FAIL("不支持的登录类型");
+        }
+    }
+
+
+
     @RequestMapping("/logout")
     @ResponseBody
     public ResultBean logout(String user){

@@ -8,7 +8,6 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 /**
  * Created by Sammax on 2016/9/26.
@@ -23,8 +22,10 @@ public class Test {
 
 
     public static void main(String[] args) throws Exception {
-        Calendar calendar=Calendar.getInstance();
-        String rowkey=format.format(calendar.getTime());
+        System.out.println("1".hashCode());
+//        System.out.println(AES.encode("123456","RKPGCDQNDBADFHQP"));
+//        Calendar calendar=Calendar.getInstance();
+//        String rowkey=format.format(calendar.getTime());
 //        Result result=HbaseClient.instance().get(ONLINE_NUM_TABLE.getBytes(),rowkey.getBytes());
 //        System.out.println("returned ----->");
 //        NavigableMap<byte[], byte[]> familyMap =result.getFamilyMap(Bytes.toBytes(COLUMN_FAMILY));
@@ -44,7 +45,7 @@ public class Test {
 //        }
 //
 //        HbaseClient.instance().close();
-        System.out.println(rowkey);
+//        System.out.println(rowkey);
     }
 
     public static void simple(HelloWorld.Processor processor){

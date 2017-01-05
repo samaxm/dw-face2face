@@ -45,7 +45,6 @@ public class RetriveJokeService implements IRetrivePaddingContentService{
 			requestCount.set(0);
 			initData();
 		}
-		
 		return bean;
 	}
 	
@@ -80,5 +79,7 @@ public class RetriveJokeService implements IRetrivePaddingContentService{
 			}
 		}
 	}
+
+
 
 }

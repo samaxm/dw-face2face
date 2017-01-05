@@ -48,6 +48,9 @@ public class SolrSearchService implements ISearchService {
 
             HttpSolrClient client=SolrSearchClient.getSolrClient();
             BaseDisplayUserInfo userInfo=new BaseDisplayUserInfo(user);
+            if(userInfo==null||userInfo.getName()==null||userInfo.getDwID()==null){
+                return false;
+            }
             client.addBean(SolrUserInfoBean.convert(userInfo));
             client.optimize();
             client.commit();

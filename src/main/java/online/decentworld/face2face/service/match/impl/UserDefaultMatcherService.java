@@ -56,6 +56,11 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	private IUserInfoService userInfoService;
 
 
+	private long lastNotifyTime=0;
+
+	private static long idleTime=5*60*1000;
+
+
 	private static Logger logger= LoggerFactory.getLogger(UserDefaultMatcherService.class);
 
 	/**
@@ -148,6 +153,14 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 					matchUserInfo= matchCache.getMatchUser(info, index);
 				}
 				if(matchUserInfo==null){
+					/*
+						并发送上线提示
+					 */
+					long current=System.currentTimeMillis();
+					if(current-lastNotifyTime>idleTime){
+						jpush.pushOnlineNotice();
+						lastNotifyTime=current;
+					}
 					return ObjectResultBean.FAIL("搜索用户中...");
 				}
 				matched=JSON.parseObject(matchUserInfo, MatchUserInfo.class);

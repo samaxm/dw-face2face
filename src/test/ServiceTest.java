@@ -1,5 +1,5 @@
+import com.alibaba.fastjson.JSON;
 import online.decentworld.charge.charger.DBCharger;
-import online.decentworld.charge.service.OrderType;
 import online.decentworld.face2face.config.ApplicationRootConfig;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.history.IMessageHistroyService;
@@ -8,13 +8,11 @@ import online.decentworld.face2face.service.register.RegisterStrategyFactory;
 import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
+import online.decentworld.face2face.service.user.impl.UserInfoWithVipInfo;
 import online.decentworld.face2face.service.wealth.IWealthService;
-import online.decentworld.rdb.entity.Order;
-import online.decentworld.rdb.mapper.LikeRecordMapper;
-import online.decentworld.rdb.mapper.OrderMapper;
-import online.decentworld.rdb.mapper.UserMapper;
-import online.decentworld.rdb.mapper.WealthMapper;
-import online.decentworld.tools.AES;
+import online.decentworld.rdb.entity.User;
+import online.decentworld.rdb.entity.VipRecords;
+import online.decentworld.rdb.mapper.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,16 +52,18 @@ public class ServiceTest {
     private WealthMapper wealthMapper;
     @Autowired
     private DBCharger dbCharger;
-
-
+    @Autowired
+    private VipRecordsMapper vipRecordsMapper;
 
     @Test
     public void test() throws Exception {
-        Order order=new Order();
-        order.setDwid("3390214868");
-        order.setExtra("IAIJ");
-        order.setType(OrderType.VIP_REGISTER.getValue());
-        vipRegisterCheckService.getVipRegisterOrderResponse(order);
+        User user=ds.selectByPrimaryKey("0215043174");
+        user.setPayPassword(null);
+        user.setPassword(null);
+        VipRecords vipRecords=vipRecordsMapper.selectByPrimaryKey("0215043174");
+        UserInfoWithVipInfo infoWithVipInfo=new UserInfoWithVipInfo(user,vipRecords);
+        System.out.println(JSON.toJSONString(infoWithVipInfo));
+
 //        JSONObject jsonObject=new JSONObject();
 //        jsonObject.put("registerType","VIP");
 //

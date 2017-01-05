@@ -50,8 +50,8 @@
     }
     function loadData(fromtime,totime){
         $.ajax({
-            url: "http://localhost:7777/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
-//            url: "http://dev.service.dawan.online/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
+//            url: "http://localhost:7777/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
+            url: "http://dev.service.dawan.online/face2face/app/onlineStatus?fromtime="+fromtime+"&totime="+totime,
             dataType:"json",
             success: function(data){
                 var maxOnline=data.data.maxOnline;

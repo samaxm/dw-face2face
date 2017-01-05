@@ -63,4 +63,6 @@ public interface IUserInfoService {
 
 
 	public void cleanUserInfoCache(String dwID);
+
+	public ResultBean getUserTags();
 }

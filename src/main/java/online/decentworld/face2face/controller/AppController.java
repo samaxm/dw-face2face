@@ -3,7 +3,7 @@ package online.decentworld.face2face.controller;
 import online.decentworld.face2face.common.AppType;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.IAppService;
-import online.decentworld.rpc.dto.api.ObjectResultBean;
+import online.decentworld.face2face.service.app.impl.IphoneOnlineStatusCommand;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +46,22 @@ public class AppController {
 
 	@RequestMapping("/iphone/status")
 	@ResponseBody
-	public ResultBean isIphoneInChek(){
-		return ObjectResultBean.SUCCESS(true);
+	public ResultBean isIphoneInChek(Integer versionNum){
+		if(versionNum==null)
+			versionNum=0;
+		return appService.getiphoneStatus(versionNum);
+	}
+
+
+
+	@RequestMapping("/set/iphone/status")
+	@ResponseBody
+	public ResultBean setIphoneStatus(String token,Integer versionNum)
+	{
+		IphoneOnlineStatusCommand command=new IphoneOnlineStatusCommand();
+		command.setToken(token);
+		command.setVersionNum(versionNum);
+		return appService.setiphoneStatus(command);
 	}
 
 
@@ -57,6 +71,13 @@ public class AppController {
 		return appService.getOnlineStatus(fromtime,totime);
 	}
 
+
+
+	@RequestMapping("/activities")
+	@ResponseBody
+	public ResultBean getActivities(@RequestParam Long activityNum){
+		return appService.getActivityList(activityNum);
+	}
 
 
 

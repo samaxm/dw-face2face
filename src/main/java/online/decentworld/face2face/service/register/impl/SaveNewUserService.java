@@ -40,16 +40,16 @@ public class SaveNewUserService {
      */
     protected User saveUser(User user) throws Exception {
         user.setWorth(1);
+        user.setCanwithdraw((byte)0);
         if(RegisterChannel.WEIXIN.name().equals(user.getRegisterChannel())){
             user.setAccount(user.getOpenid());
             user.setAccountType(TransferAccountType.WXPAY.name());
         }
         if(checkField(user)){
-
             tryStoreUser(user);
             Wealth w=new Wealth();
             w.setDwid(user.getId());
-            w.setWealth(0);
+            w.setWealth(100);
             if (Boolean.valueOf(ConfigLoader.AdminConfig.NEED_EASEMON)) {
                 easemobAPI.registerEasemobUser(user.getId(), user.getPassword());
             }
@@ -84,7 +84,7 @@ public class SaveNewUserService {
             logger.debug("[BAD_FIELD] registerChannel");
             return false;
         }else if(user.getCanwithdraw()==null){
-            logger.debug("[BAD_FIELD] can_withdrw");
+            logger.debug("[BAD_FIELD] can_withdraw");
             return false;
         }
         return true;
@@ -125,6 +125,7 @@ public class SaveNewUserService {
 
     protected User resetFields(User user){
         user.setPassword(null);
+        user.setPayPassword(null);
         return user;
     }
 

@@ -8,6 +8,10 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/online/decentworld/cache/1.0.0/cache-1.0.0-sources.jar!/" />
+      <root url="file://$PROJECT_DIR$/../cache/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../cache/src/main/resources" />
+      <root url="file://$PROJECT_DIR$/../cache/src/test/java" />
+      <root url="file://$PROJECT_DIR$/../cache/target/classes" />
     </SOURCES>
   </library>
 </component>

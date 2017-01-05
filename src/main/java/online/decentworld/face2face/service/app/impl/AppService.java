@@ -3,11 +3,13 @@ package online.decentworld.face2face.service.app.impl;
 import online.decentworld.cache.redis.ApplicationInfoCache;
 import online.decentworld.cache.redis.SessionCache;
 import online.decentworld.face2face.common.StatusCode;
+import online.decentworld.face2face.service.app.ActivityList;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.app.OnlineStatus;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.hbase.HbaseClient;
+import online.decentworld.rdb.mapper.ActivityMapper;
 import online.decentworld.rdb.mapper.AppVersionMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
@@ -34,6 +36,10 @@ public class AppService implements IAppService{
 	private ApplicationInfoCache applicationInfoCache;
 	@Autowired
 	private SessionCache sessionCache;
+	@Autowired
+	private ActivityMapper activityMapper;
+
+
 
 	private static SimpleDateFormat format=new SimpleDateFormat("yyyyMMddHHmm");
 	private static byte[] ONLINE_NUM_TABLE="ONLINE_NUM_TABLE_2016".getBytes();
@@ -81,6 +87,31 @@ public class AppService implements IAppService{
 		return  bean;
 	}
 
+	@Override
+	public ResultBean getiphoneStatus(Integer versionNum) {
+		if(applicationInfoCache.getIphoneStatus()>versionNum)
+			return ObjectResultBean.SUCCESS(false);
+		else
+			return ObjectResultBean.SUCCESS(true);
+	}
+
+	@Override
+	public ResultBean setiphoneStatus(IphoneOnlineStatusCommand command) {
+		if(command.getToken().equals("sammaxsimple")){
+			if(applicationInfoCache.setIphoneStatus(command.getVersionNum())){
+				return ResultBean.SUCCESS;
+			}
+		}
+		return ResultBean.FAIL("");
+	}
+
+	@Override
+	public ResultBean getActivityList(long dateNum) {
+		ActivityList list=new ActivityList();
+		list.setDateNum(dateNum);
+		list.setList(activityMapper.getActivityByDateNum(dateNum));
+		return ObjectResultBean.SUCCESS(list);
+	}
 
 
 	private List<OnlineStatus> queryOnlineStatus(String fromtime,String totime){

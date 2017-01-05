@@ -73,8 +73,8 @@ public class WealthController {
 
     @RequestMapping("/tip")
     @ResponseBody
-    public ResultBean tip(@RequestParam String dwID,@RequestParam String toID,@RequestParam String pay_password,@RequestParam int amount){
-        return wealthService.tip(dwID,pay_password,toID,amount);
+    public ResultBean tip(@RequestParam String dwID,@RequestParam String toID,String pay_password,@RequestParam int amount){
+        return wealthService.tip(dwID,toID,amount);
     }
 
     @RequestMapping("")

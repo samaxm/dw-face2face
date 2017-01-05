@@ -60,9 +60,6 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
     @Autowired
     private UserMapper userMapper;
 
-
-    //10yuan
-    final private static int VIP_REGISTER_FEE=1000;
     final private static String REGISTER_NOTICE="大我VIP注册";
 
     @Override
@@ -175,7 +172,7 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
         try {
             PartnerCode code=partnerCodeMapper.isCodeExist(vipCode);
             if(code!=null&&code.getDwid().equals(dwID)&&code.getStatus().equals(PartnerCode.Status.CHECKED.name())){
-                OrderReceipt receipt=orderService.createOrder(payChannel, VIP_REGISTER_FEE, dwID, OrderType.VIP_REGISTER, vipCode, ip, REGISTER_NOTICE);
+                OrderReceipt receipt=orderService.createOrder(payChannel, code.getChargeMoney(), dwID, OrderType.VIP_REGISTER, vipCode, ip, REGISTER_NOTICE);
                 return ObjectResultBean.SUCCESS(receipt.getRequestData());
             }else{
                 return ResultBean.FAIL("无效的邀请码");

@@ -44,6 +44,14 @@ public class UserInfoController {
 		}
 	}
 
+	@RequestMapping("/tags")
+	@ResponseBody
+	public ResultBean getUserTags(){
+		return userService.getUserTags();
+	}
+
+
+
 	@RequestMapping("/bind/phone")
 	@ResponseBody
 	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code){
@@ -81,6 +89,7 @@ public class UserInfoController {
 		try{
 			return userService.setWorth(dwID,paypassword,worth);
 		}catch (Exception e){
+			logger.warn("",e);
 			return ObjectResultBean.FAIL("设置身价失败");
 		}
 	}

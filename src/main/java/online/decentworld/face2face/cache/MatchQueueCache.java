@@ -20,7 +20,7 @@ import static online.decentworld.cache.redis.ReturnResult.result;
  */
 @Component
 public class MatchQueueCache extends RedisTemplate {
-	
+	private static int EXPIRE=5*60;
 	private static Logger logger=LoggerFactory.getLogger(MatchQueueCache.class);
 //	public String getMatchUser(MatchUserInfo userInfo,int index){
 //		Jedis jedis=null;
@@ -49,18 +49,27 @@ public class MatchQueueCache extends RedisTemplate {
 	 * @return
 	 */
 	public String getMatchUser(MatchUserInfo userInfo,int index){
-		logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID()+" index#"+index);
+
 		String myinfo=JSON.toJSONString(userInfo);
 		ReturnResult result=cache((Jedis jedis)->{
-			jedis.srem(WebCacheKey.MATCH_SET,myinfo);
-			String info=jedis.spop(WebCacheKey.MATCH_SET);
-//			String info=jedis.lpop(WebCacheKey.MATCH_QUEUE_KEY(index));
-			if(info!=null){
-				return result(info);
+			jedis.srem(WebCacheKey.MATCH_SET,userInfo.getDwID());
+			String matchID=jedis.spop(WebCacheKey.MATCH_SET);
+
+			if(matchID!=null){
+				String info=jedis.get(WebCacheKey.MATCH_INFO(matchID));
+				logger.debug("[GET_MATCH] dwID#"+userInfo.getDwID()+" index#"+index+" matchID#"+matchID+" matchInfo#"+info);
+				if(info!=null){
+					return result(info);
+				}else{
+					//需要将用户加入等待队列
+					jedis.setex(WebCacheKey.MATCH_INFO(userInfo.getDwID()),EXPIRE,myinfo);
+					jedis.sadd(WebCacheKey.MATCH_SET, userInfo.getDwID());
+					return ReturnResult.SUCCESS;
+				}
 			}else{
 				//需要将用户加入等待队列
-//				jedis.rpush(WebCacheKey.MATCH_QUEUE_KEY(index), JSON.toJSONString(userInfo));
-				jedis.sadd(WebCacheKey.MATCH_SET,myinfo);
+				jedis.setex(WebCacheKey.MATCH_INFO(userInfo.getDwID()),EXPIRE,myinfo);
+				jedis.sadd(WebCacheKey.MATCH_SET, userInfo.getDwID());
 				return ReturnResult.SUCCESS;
 			}
 		});
@@ -99,9 +108,10 @@ public class MatchQueueCache extends RedisTemplate {
 	public void removeMatchUser(MatchUserInfo userInfo){
 		logger.debug("[REMOVE_MATCH] dwID#"+userInfo.getDwID());
 		cache((Jedis jedis)->{
-			jedis.srem(WebCacheKey.MATCH_SET,JSON.toJSONString(userInfo));
+			jedis.srem(WebCacheKey.MATCH_SET,userInfo.getDwID());
 			return ReturnResult.SUCCESS;
 		});
 	}
+
 
 }
