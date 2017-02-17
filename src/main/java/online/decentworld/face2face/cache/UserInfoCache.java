@@ -4,7 +4,7 @@ import online.decentworld.cache.redis.RedisTemplate;
 import online.decentworld.cache.redis.ReturnResult;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by Sammax on 2016/12/26.
@@ -12,15 +12,23 @@ import java.util.Set;
 @Component
 public class UserInfoCache extends RedisTemplate {
 
-    public Set<String> getUserTags(){
+    public  List<String> getUserTags(){
         ReturnResult result=cache(jedis->{
-            Set<String> tags=jedis.smembers(WebCacheKey.USER_TAG);
+            List<String> tags=jedis.lrange(WebCacheKey.USER_TAG, 0, -1);
             return ReturnResult.result(tags);
         });
         if(result.isSuccess()){
-            return (Set<String>) result.getResult();
+            return ( List<String> ) result.getResult();
         }else{
             return null;
         }
+    }
+
+    public void setTags(List<String> list){
+        cache(jedis->{
+            jedis.del(WebCacheKey.USER_TAG);
+            jedis.rpush(WebCacheKey.USER_TAG, list.toArray(new String[list.size()]));
+            return ReturnResult.SUCCESS;
+        });
     }
 }

@@ -54,8 +54,10 @@ public class UserInfoController {
 
 	@RequestMapping("/bind/phone")
 	@ResponseBody
-	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code){
-		return userService.bindUserPhoneNum(dwID, phoneNum, code);
+	public ResultBean bindPhone(@RequestParam String dwID,@RequestParam String phoneNum,@RequestParam String code,Boolean isNotRegister){
+		if(isNotRegister==null)
+			isNotRegister=false;
+		return userService.bindUserPhoneNum(dwID, phoneNum, code,isNotRegister);
 	}
 
 	@RequestMapping("/bind/account")
@@ -97,10 +99,12 @@ public class UserInfoController {
 
 	@RequestMapping("/set/info")
 	@ResponseBody
-	public ResultBean setUserInfo(@RequestParam String password,@RequestParam String dwID,String info,HttpServletRequest request){
-
+	public ResultBean setUserInfo(@RequestParam String password,@RequestParam String dwID,String info,Integer iconIndex,HttpServletRequest request){
 		ResultBean bean;
 		User user;
+		if(iconIndex==null){
+			iconIndex=0;
+		}
 		try{
 			if(ServletFileUpload.isMultipartContent(request)){
 				Collection<Part> parts=request.getParts();
@@ -127,11 +131,10 @@ public class UserInfoController {
 				user=JSON.parseObject(info,User.class);
 				user.setId(dwID);
 				user.setPassword(AES.decode(password));
-				return userService.updateUserInfo(user);
+				return userService.updateUserInfo(user,iconIndex);
 			}else{
 				return ResultBean.FAIL("未有修改信息");
 			}
-
 		}catch (Exception e){
 			bean=ResultBean.FAIL("格式错误");
 			logger.debug("[ERROR_JSON] info#"+info,e);

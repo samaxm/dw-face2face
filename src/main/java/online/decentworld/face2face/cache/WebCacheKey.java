@@ -40,4 +40,7 @@ public class WebCacheKey extends CacheKey {
     public static String VIP_MATCH_SET="vip_MATCH:SET";
     public static String USER_TAG="USER_TAG";
     public static String MATCH_INFO(String dwID){return dwID+":MI";}
+
+    public static String ACTIVITY_ANSWER_SET(int activityID){return activityID+":answer";}
+    public static String ACTIVITY_ANSWER_INDEX(int activityID){return activityID+":answer:index";}
 }

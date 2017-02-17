@@ -22,7 +22,8 @@ public class Test {
 
 
     public static void main(String[] args) throws Exception {
-        System.out.println("1".hashCode());
+        System.out.println("aaaaa;aaa".split(";").length);
+        System.out.println("aaaaa;aaa".split(";")[0]);
 //        System.out.println(AES.encode("123456","RKPGCDQNDBADFHQP"));
 //        Calendar calendar=Calendar.getInstance();
 //        String rowkey=format.format(calendar.getTime());

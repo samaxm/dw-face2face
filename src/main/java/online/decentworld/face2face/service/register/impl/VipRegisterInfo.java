@@ -30,4 +30,5 @@ public class VipRegisterInfo {
     public void setFormat(String format) {
         this.format = format;
     }
+
 }

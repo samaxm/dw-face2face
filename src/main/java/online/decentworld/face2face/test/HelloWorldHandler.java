@@ -9,5 +9,7 @@ public class HelloWorldHandler implements  HelloWorld.Iface {
     @Override
     public void hello(String word) throws TException {
         System.out.println(word);
+
+
     }
 }

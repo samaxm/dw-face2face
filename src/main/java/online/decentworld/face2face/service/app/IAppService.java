@@ -1,12 +1,9 @@
 package online.decentworld.face2face.service.app;
 
 import online.decentworld.face2face.service.app.impl.IphoneOnlineStatusCommand;
-import online.decentworld.rdb.entity.Activity;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
-
-import java.util.List;
 
 public interface IAppService {
 	public ObjectResultBean checkVersion(String type);
@@ -23,4 +20,7 @@ public interface IAppService {
 
 	public ResultBean getActivityList(long dateNum);
 
+	public ResultBean checkActivityAnswer(int activityID,String answer,String dwID);
+	//回答对暗号后上传地址
+	public ResultBean uploadAdress(String dwID,int answerID,String address);
 }

@@ -15,7 +15,7 @@ public interface IUserMatcherService {
 
 	public ResultBean getVipMatch(MatchUserInfo  info);
 
-	public ResultBean getMatchUserWithPriority(String dwID,String name,String icon,String sign,boolean isPrioritized);
+	public ResultBean getMatchUserWithPriority(String dwID,String name,String icon,String sign,String tag,boolean isPrioritized);
 
 	public ResultBean likeUser(String dwID,String likedID);
 
@@ -23,7 +23,7 @@ public interface IUserMatcherService {
 
 	public ListResultBean<LikeRecordDetail> getLikeRequests(String dwID);
 
-	public void removeMatch(String dwID,String name,String icon,String sign);
+	public void removeMatch(String dwID,String name,String icon,String sign,String tag);
 
 
 	public void removeVIPMatch(MatchUserInfo info);

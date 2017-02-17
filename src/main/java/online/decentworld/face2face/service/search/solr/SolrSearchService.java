@@ -61,4 +61,32 @@ public class SolrSearchService implements ISearchService {
             return false;
         }
     }
+
+    @Override
+    public boolean batchSave(List<User> user) {
+        if(user==null){
+            return false;
+        }
+        try {
+
+            HttpSolrClient client=SolrSearchClient.getSolrClient();
+            user.forEach(u->{
+                BaseDisplayUserInfo userInfo=new BaseDisplayUserInfo(u);
+                if(userInfo!=null&&userInfo.getName()!=null&&userInfo.getDwID()!=null){
+                    try {
+                        client.addBean(SolrUserInfoBean.convert(userInfo));
+                    } catch (Exception e) {
+                        logger.debug("insert fail",e);
+                    }
+                }
+
+            });
+            client.optimize();
+            client.commit();
+            return true;
+        } catch (Exception e) {
+            logger.warn("[UPDATE_FAILED] info#"+ JSON.toJSONString(user),e);
+            return false;
+        }
+    }
 }

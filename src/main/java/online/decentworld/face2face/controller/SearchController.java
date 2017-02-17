@@ -1,7 +1,7 @@
 package online.decentworld.face2face.controller;
 
 import online.decentworld.face2face.service.search.ISearchService;
-import online.decentworld.rpc.dto.api.ListResultBean;
+import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,9 +26,7 @@ public class SearchController {
         if(page==null){
             page=0;
         }
-        ListResultBean result=new ListResultBean();
-        result.setData(searchService.searchWholeContext(keyword,page));
-        return result;
+        return ObjectResultBean.SUCCESS(searchService.searchWholeContext(keyword,page));
     }
 
 }

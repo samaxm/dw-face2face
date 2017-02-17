@@ -12,4 +12,6 @@ public interface ISearchService {
     List searchWholeContext(String searchValue,int page);
 
     boolean saveOrUpdateIndex(User info);
+
+    boolean batchSave(List<User> user);
 }

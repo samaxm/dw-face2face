@@ -67,7 +67,7 @@ public class SaveNewUserService {
         if(user.getPassword()==null){
             logger.debug("[BAD_FIELD] getPassword#"+user.getPassword());
             return false;
-        }else  if(user.getName()==null||user.getName().length()>20){
+        }else  if(user.getName()!=null&&user.getName().length()>20){
             logger.debug("[BAD_FIELD] getName#"+user.getName());
             return false;
 

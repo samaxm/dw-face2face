@@ -8,6 +8,7 @@ import online.decentworld.rpc.dto.api.ResultBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,6 +69,8 @@ public class AppController {
 	@RequestMapping("/onlineStatus")
 	@ResponseBody
 	public ResultBean getOnlineNum(@RequestParam String fromtime,@RequestParam String totime){
+		HttpHeaders headers=new HttpHeaders();
+		headers.set("Access-Control-Allow-Origin", "*");
 		return appService.getOnlineStatus(fromtime,totime);
 	}
 
@@ -75,11 +78,22 @@ public class AppController {
 
 	@RequestMapping("/activities")
 	@ResponseBody
-	public ResultBean getActivities(@RequestParam Long activityNum){
-		return appService.getActivityList(activityNum);
+	public ResultBean getActivities(@RequestParam Long dateNum){
+		return appService.getActivityList(dateNum);
 	}
 
 
+	@RequestMapping("/activity/answer")
+	@ResponseBody
+	public ResultBean checkActivityAnswer(@RequestParam Integer activityID,@RequestParam String dwID,@RequestParam String answer){
+		return appService.checkActivityAnswer(activityID,answer,dwID);
+	}
 
+
+	@RequestMapping("/activity/address")
+	@ResponseBody
+	public ResultBean uploadAddress(@RequestParam Integer answerID,@RequestParam String dwID,@RequestParam String address){
+		return appService.uploadAdress(dwID,answerID,address);
+	}
 
 }

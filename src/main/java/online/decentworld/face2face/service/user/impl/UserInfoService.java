@@ -10,7 +10,6 @@ import online.decentworld.charge.service.TransferAccountType;
 import online.decentworld.face2face.api.easemob.EasemobApiUtil;
 import online.decentworld.face2face.cache.UserInfoCache;
 import online.decentworld.face2face.common.TokenType;
-import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.service.search.ISearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.security.token.ITokenCheckService;
@@ -56,7 +55,7 @@ public class UserInfoService implements IUserInfoService{
 	private static Logger logger=LoggerFactory.getLogger(UserInfoService.class);
 
 	@Override
-	public ResultBean bindUserPhoneNum(String dwID, String phoneNum,String code) {
+	public ResultBean bindUserPhoneNum(String dwID, String phoneNum,String code,Boolean isNotRegister) {
 		if(!tokenService.checkToken(phoneNum,TokenType.BIND_PHONE,code)){
 			return ObjectResultBean.FAIL("验证码错误");
 		}else{
@@ -66,7 +65,10 @@ public class UserInfoService implements IUserInfoService{
 				 * 绑定成功后直接返回一个可以设置密码的token
 				 */
 			    String token= IDUtil.randomToken();
-				tokenService.cacheToken(phoneNum,TokenType.CHANGE_PWD,token);
+				if(!isNotRegister)
+					tokenService.cacheToken(phoneNum,TokenType.CHANGE_PWD,token);
+				else
+					tokenService.cacheToken(phoneNum,TokenType.SET_PAY_PASSWORD,token);
 				return ObjectResultBean.SUCCESS(token);
 			}catch (DuplicateKeyException e){
 				return ObjectResultBean.FAIL("该手机号码已被绑定");
@@ -90,7 +92,7 @@ public class UserInfoService implements IUserInfoService{
 
 	@Override
 	@CacheEvict(value="redis_online.decentworld.rdb.entity.BaseDisplayUserInfo" ,key="#user.id")
-	public ResultBean updateUserInfo(User user) {
+	public ResultBean updateUserInfo(User user,Integer iconIndex) {
 		if(user.getName()!=null&&user.getName().length()>20){
 			return ResultBean.FAIL("您的用戶名過長！最多十個字符");
 		}else{
@@ -99,11 +101,32 @@ public class UserInfoService implements IUserInfoService{
 				User u=userMapper.selectByPrimaryKey(user.getId());
 				if(password.equals(u.getPassword())){
 					user=UserFieldFilter(user);
-					userMapper.updateByPrimaryKeySelective(user);
+					String replacedURL=null;
 					if(user.getIcon()!=null&&u.getIcon()!=null&&!u.getIcon().equals("")){
-						FastDFSClient.deleteByFullName(u.getIcon());
+						String[] arr=u.getIcon().split(";");
+						if(arr.length<=iconIndex){
+							user.setIcon(u.getIcon()+";"+user.getIcon());
+						}else {
+							if(arr.length>1){
+								replacedURL=arr[iconIndex];
+								arr[iconIndex]=user.getIcon();
+								StringBuilder stringBuilder=new StringBuilder();
+								for(int i=0;i<arr.length-1;i++){
+									stringBuilder.append(arr[i]).append(";");
+								}
+								stringBuilder.append(arr[arr.length-1]);
+								user.setIcon(stringBuilder.toString());
+							}else{
+								replacedURL=u.getIcon();
+							}
+						}
 					}
-					searchService.saveOrUpdateIndex(user);
+					userMapper.updateByPrimaryKeySelective(user);
+					if(replacedURL!=null){
+						FastDFSClient.deleteByFullName(replacedURL);
+					}
+					u=userMapper.selectByPrimaryKey(user.getId());
+					searchService.saveOrUpdateIndex(u);
 					return ObjectResultBean.SUCCESS(user);
 				}else{
 					return ResultBean.FAIL("身份校验错误");
@@ -170,10 +193,10 @@ public class UserInfoService implements IUserInfoService{
 
 	@Override
 	public ResultBean setWorth(String dwID, String paypassword, int worth) {
-		String type=userMapper.getUserType(dwID);
-		if(!UserType.STAR.getName().equals(type)){
-			return ResultBean.FAIL("目前该功能仅对VIP用户开放");
-		}
+//		String type=userMapper.getUserType(dwID);
+//		if(!UserType.STAR.getName().equals(type)){
+//			return ResultBean.FAIL("目前该功能仅对VIP用户开放");
+//		}
 		if(authorityService.checkPayPassword(dwID,paypassword)){
 			try {
 				ChargeReceipt receipt=chargeService.charge(new ChangeWorthEvent(worth, dwID));

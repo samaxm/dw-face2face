@@ -1,23 +1,25 @@
-import com.alibaba.fastjson.JSON;
 import online.decentworld.charge.charger.DBCharger;
+import online.decentworld.face2face.cache.ActivityCache;
+import online.decentworld.face2face.cache.UserInfoCache;
 import online.decentworld.face2face.config.ApplicationRootConfig;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.history.IMessageHistroyService;
 import online.decentworld.face2face.service.register.IVipRegisterCheckService;
 import online.decentworld.face2face.service.register.RegisterStrategyFactory;
-import online.decentworld.face2face.service.search.ISearchService;
+import online.decentworld.face2face.service.search.solr.SolrSearchService;
 import online.decentworld.face2face.service.security.authority.IUserAuthorityService;
 import online.decentworld.face2face.service.user.IUserInfoService;
-import online.decentworld.face2face.service.user.impl.UserInfoWithVipInfo;
 import online.decentworld.face2face.service.wealth.IWealthService;
 import online.decentworld.rdb.entity.User;
-import online.decentworld.rdb.entity.VipRecords;
 import online.decentworld.rdb.mapper.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sammax on 2016/9/26.
@@ -32,8 +34,6 @@ public class ServiceTest {
     private IUserInfoService userInfoService;
     @Autowired
     private IWealthService wealthService;
-    @Autowired
-    private ISearchService solrSearchService;
     @Autowired
     private UserMapper ds;
     @Autowired
@@ -54,15 +54,60 @@ public class ServiceTest {
     private DBCharger dbCharger;
     @Autowired
     private VipRecordsMapper vipRecordsMapper;
+    @Autowired
+    private ActivityCache activityCache;
+    @Autowired
+    private SolrSearchService solrSearchService;
+    @Autowired
+    private UserInfoCache userInfoCache;
+
+    @Test
+    public void insertSolr(){
+        List<User> user=ds.getAllUsers();
+        solrSearchService.batchSave(user);
+    }
+
+    @Test
+    public void insertTagsAndGet(){
+        List<String> list=new ArrayList<>(11);
+        list.add("善知识");
+        list.add("非想非非想");
+        list.add("承担如来家当");
+        list.add("素食主义");
+        list.add("心中有佛的");
+        list.add("开悟");
+        list.add("专修净土");
+        list.add("持戒者");
+        list.add("自在");
+        list.add("觉缘");
+        list.add("菩萨戒");
+        userInfoCache.setTags(list);
+        List<String> tags=userInfoCache.getUserTags();
+        for(String tag:tags){
+            System.out.println(tag);
+        }
+    }
+
+    @Test
+    public void test2(){
+        String dwID="0334631949";
+        User user=new User();
+        user.setId(dwID);
+        user.setIcon("123123");
+        userInfoService.updateUserInfo(user,1);
+
+
+    }
 
     @Test
     public void test() throws Exception {
-        User user=ds.selectByPrimaryKey("0215043174");
-        user.setPayPassword(null);
-        user.setPassword(null);
-        VipRecords vipRecords=vipRecordsMapper.selectByPrimaryKey("0215043174");
-        UserInfoWithVipInfo infoWithVipInfo=new UserInfoWithVipInfo(user,vipRecords);
-        System.out.println(JSON.toJSONString(infoWithVipInfo));
+        activityCache.writeAnswerCache(42);
+//        User user=ds.selectByPrimaryKey("0215043174");
+//        user.setPayPassword(null);
+//        user.setPassword(null);
+//        VipRecords vipRecords=vipRecordsMapper.selectByPrimaryKey("0215043174");
+//        UserInfoWithVipInfo infoWithVipInfo=new UserInfoWithVipInfo(user,vipRecords);
+//        System.out.println(JSON.toJSONString(infoWithVipInfo));
 
 //        JSONObject jsonObject=new JSONObject();
 //        jsonObject.put("registerType","VIP");

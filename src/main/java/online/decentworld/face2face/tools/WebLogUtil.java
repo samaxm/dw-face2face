@@ -24,6 +24,9 @@ public class WebLogUtil extends LogUtil {
 			ServletServerHttpRequest sr=(ServletServerHttpRequest)request;
 			HttpServletRequest r=sr.getServletRequest();
 			Map<String,String[]> parameters=r.getParameterMap();
+			if(parameters.containsKey("file")){
+				parameters.remove("file");
+			}
 			if(parameters==null||parameters.size()==0){
 				return "null";
 			}else{

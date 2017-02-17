@@ -14,7 +14,7 @@ public interface IUserInfoService {
 	 * @param code
 	 * @return
 	 */
-	public ResultBean bindUserPhoneNum(String dwID,String phoneNum,String code);
+	public ResultBean bindUserPhoneNum(String dwID,String phoneNum,String code,Boolean isNotRegister);
 
 	/**
 	 * 获取用户信息
@@ -27,7 +27,7 @@ public interface IUserInfoService {
 	 * @param user
 	 * @return
 	 */
-	public ResultBean updateUserInfo(User user);
+	public ResultBean updateUserInfo(User user,Integer iconIndex);
 
 	/**
 	 * 绑定用户转账账户

@@ -2,13 +2,16 @@ package online.decentworld.face2face.service.app.impl;
 
 import online.decentworld.cache.redis.ApplicationInfoCache;
 import online.decentworld.cache.redis.SessionCache;
+import online.decentworld.face2face.cache.ActivityCache;
 import online.decentworld.face2face.common.StatusCode;
 import online.decentworld.face2face.service.app.ActivityList;
 import online.decentworld.face2face.service.app.IAppService;
 import online.decentworld.face2face.service.app.OnlineStatus;
+import online.decentworld.rdb.entity.ActivityAnswer;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
 import online.decentworld.rdb.hbase.HbaseClient;
+import online.decentworld.rdb.mapper.ActivityAnswerMapper;
 import online.decentworld.rdb.mapper.ActivityMapper;
 import online.decentworld.rdb.mapper.AppVersionMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
@@ -38,6 +41,10 @@ public class AppService implements IAppService{
 	private SessionCache sessionCache;
 	@Autowired
 	private ActivityMapper activityMapper;
+	@Autowired
+	private ActivityAnswerMapper activityAnswerMapper;
+	@Autowired
+	private ActivityCache activityCache;
 
 
 
@@ -111,6 +118,30 @@ public class AppService implements IAppService{
 		list.setDateNum(dateNum);
 		list.setList(activityMapper.getActivityByDateNum(dateNum));
 		return ObjectResultBean.SUCCESS(list);
+	}
+
+	@Override
+	public ResultBean checkActivityAnswer(int activityID, String answer,String dwID) {
+		Integer id=activityCache.isAnswerRight(activityID, answer);
+		if(id==null){
+			return ResultBean.FAIL("抱歉，答案错误哦，你是不是被戏弄了啊= =");
+		}else{
+			activityAnswerMapper.updateAnswerStatus(id,true,dwID);
+			ActivityAnswer an=activityAnswerMapper.selectByPrimaryKey(id);
+			return ObjectResultBean.SUCCESS(an);
+		}
+	}
+
+	@Override
+	public ResultBean uploadAdress(String dwID, int answerID, String address) {
+		ActivityAnswer answer=activityAnswerMapper.selectForUpdate(answerID);
+		if(answer!=null&&answer.getChecked()&&dwID.equals(answer.getDwid())){
+			answer.setContact(address);
+			activityAnswerMapper.updateByPrimaryKey(answer);
+			return ObjectResultBean.SUCCESS(answer);
+		}else {
+			return ResultBean.FAIL("");
+		}
 	}
 
 

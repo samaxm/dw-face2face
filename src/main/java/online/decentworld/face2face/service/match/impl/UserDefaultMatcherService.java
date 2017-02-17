@@ -132,13 +132,13 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
-	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon,String sign, boolean isPrioritized) {
+	public ResultBean getMatchUserWithPriority(String dwID, String name, String icon,String sign,String tag,boolean isPrioritized) {
 		MapResultBean<String,MatchUserInfo> bean=new MapResultBean<String,MatchUserInfo>();
 		if(reportService.isUserBlock(dwID)){
 			bean.setStatusCode(FAILED);
 			bean.setMsg("抱歉，您被举报次数过多已被封号");
 		}else{
-			MatchUserInfo info=new MatchUserInfo(dwID, name, icon,sign);
+			MatchUserInfo info=new MatchUserInfo(dwID, name, icon,sign,tag);
 			MatchUserInfo matched;
 			String matchUserInfo;
 			/**
@@ -175,6 +175,7 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	@Override
 	public ResultBean likeUser(String dwID, String likedID) {
 		LikeRecord record=new LikeRecord(dwID,likedID);
+		BaseDisplayUserInfo userInfo=null;
 		try{
 			likeMapper.insertSelective(record);
 			try {
@@ -185,12 +186,14 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 			}catch (Exception e){
 				logger.warn("",e);
 			}
+			userInfo=userInfoService.getUserInfo(likedID);
+
 		}catch(DuplicateKeyException ex){
 			return ResultBean.FAIL("已经收藏对方了");
 		} catch (Exception e) {
 			logger.warn("[SEND_MQ_FAILED] LIKE_MESSAGE dwID#"+dwID+" likedID#"+likedID,e);
 		}
-		return ResultBean.SUCCESS;
+		return ObjectResultBean.SUCCESS(userInfo);
 	}
 
 
@@ -214,8 +217,8 @@ public class UserDefaultMatcherService implements IUserMatcherService{
 	}
 
 	@Override
-	public void removeMatch(String dwID, String name, String icon,String sign) {
-		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon,sign));
+	public void removeMatch(String dwID, String name, String icon,String sign,String tag) {
+		matchCache.removeMatchUser(new MatchUserInfo(dwID,name,icon,sign,tag));
 	}
 
 	@Override
