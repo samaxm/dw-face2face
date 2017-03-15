@@ -49,7 +49,7 @@ public class SaveNewUserService {
             tryStoreUser(user);
             Wealth w=new Wealth();
             w.setDwid(user.getId());
-            w.setWealth(100);
+            w.setWealth(0);
             if (Boolean.valueOf(ConfigLoader.AdminConfig.NEED_EASEMON)) {
                 easemobAPI.registerEasemobUser(user.getId(), user.getPassword());
             }

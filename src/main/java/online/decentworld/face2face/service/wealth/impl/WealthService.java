@@ -157,7 +157,8 @@ public class WealthService implements IWealthService {
     public ResultBean getRechargeResponse(String dwID, String orderNum, int amount) throws Exception {
 
         Order order=orderService.getOrder(orderNum);
-        if(order.getType()==OrderType.RECHARGE.getValue()||!order.getIsPaid()) {
+        logger.debug(JSON.toJSONString(order));
+        if(order.getType()==OrderType.RECHARGE.getValue()&&!order.getIsPaid()) {
             //user recharge logic
             chargeService.charge(new RechargeEvent(dwID, amount, orderNum));
             try {
@@ -169,14 +170,14 @@ public class WealthService implements IWealthService {
                 logger.warn("[PUSH_RECHARGE_NOTICE_FAIL] dwID#" + dwID + " orderNum#" + orderNum + " amount#" + amount, e);
             }
             return ResultBean.SUCCESS;
-        }else if(order.getType()==OrderType.VIP_REGISTER.getValue()){
+        }else{
             if(!order.getIsPaid()){
                 //user vip register logic
                 vipRegisterService.getVipRegisterOrderResponse(order);
             }
             return ResultBean.SUCCESS;
         }
-        return ResultBean.FAIL("invalid order");
+//        return ResultBean.FAIL("invalid order");
     }
 
 

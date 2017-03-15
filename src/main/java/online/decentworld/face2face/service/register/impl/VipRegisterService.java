@@ -7,7 +7,6 @@ import online.decentworld.charge.service.OrderType;
 import online.decentworld.charge.service.PayChannel;
 import online.decentworld.face2face.common.CommonProperties;
 import online.decentworld.face2face.common.RegisterChannel;
-import online.decentworld.face2face.common.TokenType;
 import online.decentworld.face2face.common.UserType;
 import online.decentworld.face2face.exception.RegisterFailException;
 import online.decentworld.face2face.service.register.IRegisterService;
@@ -94,23 +93,20 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
                         user.setVersion(0);
                         user.setWorth(CommonProperties.DEFAULT_WORTH);
                         user.setInit(false);
+                        user.setName(partnerCode.getDwid());
+                        user.setRegisterChannel(RegisterChannel.PHONE.name());
                     }
                 }else if(format.equals(RegisterType.PHONECODE.name())){
                     PhoneCodeRegisterInfo infoBean=JSON.parseObject(vipRegisterInfo.getRegisterInfo(),PhoneCodeRegisterInfo.class);
-                    if(tokenService.checkToken(infoBean.getPhoneNum(), TokenType.BIND_PHONE, infoBean.getCode())){
-                            String password= AES.decode(infoBean.getPassword());
-                            String phone=infoBean.getPhoneNum();
-                            user=userMapper.selectByPhoneNum(phone);
-                            if(user!=null){
-                                return ResultBean.FAIL("手机号码已被绑定,请尝试找回密码");
-                            }
-                            String id= partnerCode.getDwid();
-                            user=new User(id,null,null,null,id,
-                                    password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.getName(),true, RegisterChannel.PHONE.name(),null,null,null,(byte)0);
-
-                    }else{
-                        return ResultBean.FAIL("手机验证码错误");
+                    String password= AES.decode(infoBean.getPassword());
+                    String phone=infoBean.getPhoneNum();
+                    user=userMapper.selectByPhoneNum(phone);
+                    if(user!=null){
+                        return ResultBean.FAIL("手机号码已被绑定,请尝试找回密码");
                     }
+                    String id= partnerCode.getDwid();
+                    user=new User(id,null,null,null,id,
+                            password,null, CommonProperties.DEFAULT_WORTH,null,null,phone,0, UserType.UNCERTAIN.getName(),true, RegisterChannel.PHONE.name(),null,null,null,(byte)0);
                 }else{
                     return ResultBean.FAIL("不支持的注册类型");
                 }
@@ -185,10 +181,7 @@ public class VipRegisterService extends SaveNewUserService implements IRegisterS
 
     @Transactional
     public void getVipRegisterOrderResponse(Order order){
-        if(order==null||order.getType()!=OrderType.VIP_REGISTER.getValue()){
-            return;
-        }
-        PartnerCode code=partnerCodeMapper.isCodeExist(order.getExtra());
+        PartnerCode code=partnerCodeMapper.isCodeExist(order.getExtra().toUpperCase());
         if(code==null||!code.getDwid().equals(order.getDwid())||!code.getStatus().equals(PartnerCode.Status.CHECKED.name())){
             logger.warn("[Strange State] order#"+order.toString());
         }else{

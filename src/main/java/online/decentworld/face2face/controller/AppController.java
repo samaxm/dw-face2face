@@ -82,6 +82,13 @@ public class AppController {
 		return appService.getActivityList(dateNum);
 	}
 
+	@RequestMapping("/game")
+	@ResponseBody
+	public ResultBean getGame(){
+		return appService.getWebGame();
+	}
+
+
 
 	@RequestMapping("/activity/answer")
 	@ResponseBody

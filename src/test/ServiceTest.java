@@ -70,17 +70,17 @@ public class ServiceTest {
     @Test
     public void insertTagsAndGet(){
         List<String> list=new ArrayList<>(11);
-        list.add("善知识");
-        list.add("非想非非想");
-        list.add("承担如来家当");
-        list.add("素食主义");
-        list.add("心中有佛的");
-        list.add("开悟");
-        list.add("专修净土");
-        list.add("持戒者");
-        list.add("自在");
-        list.add("觉缘");
-        list.add("菩萨戒");
+        list.add("腹黑直男");
+        list.add("高能鬼畜逗逼");
+        list.add("说闹觉余");
+        list.add("怪蜀黍");
+        list.add("软妹子~~~");
+        list.add("会算命");
+        list.add("傲娇御姐");
+        list.add("毒舌腐女");
+        list.add("战五渣");
+        list.add("伸手党");
+        list.add("脸盲症患者");
         userInfoCache.setTags(list);
         List<String> tags=userInfoCache.getUserTags();
         for(String tag:tags){

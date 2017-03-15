@@ -23,4 +23,6 @@ public interface IAppService {
 	public ResultBean checkActivityAnswer(int activityID,String answer,String dwID);
 	//回答对暗号后上传地址
 	public ResultBean uploadAdress(String dwID,int answerID,String address);
+
+	public ResultBean getWebGame();
 }

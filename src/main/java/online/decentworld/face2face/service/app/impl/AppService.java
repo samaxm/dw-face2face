@@ -10,10 +10,12 @@ import online.decentworld.face2face.service.app.OnlineStatus;
 import online.decentworld.rdb.entity.ActivityAnswer;
 import online.decentworld.rdb.entity.AppVersion;
 import online.decentworld.rdb.entity.BaseDisplayUserInfo;
+import online.decentworld.rdb.entity.WebGame;
 import online.decentworld.rdb.hbase.HbaseClient;
 import online.decentworld.rdb.mapper.ActivityAnswerMapper;
 import online.decentworld.rdb.mapper.ActivityMapper;
 import online.decentworld.rdb.mapper.AppVersionMapper;
+import online.decentworld.rdb.mapper.WebGameMapper;
 import online.decentworld.rpc.dto.api.MapResultBean;
 import online.decentworld.rpc.dto.api.ObjectResultBean;
 import online.decentworld.rpc.dto.api.ResultBean;
@@ -45,7 +47,8 @@ public class AppService implements IAppService{
 	private ActivityAnswerMapper activityAnswerMapper;
 	@Autowired
 	private ActivityCache activityCache;
-
+	@Autowired
+	private WebGameMapper webGameMapper;
 
 
 	private static SimpleDateFormat format=new SimpleDateFormat("yyyyMMddHHmm");
@@ -142,6 +145,12 @@ public class AppService implements IAppService{
 		}else {
 			return ResultBean.FAIL("");
 		}
+	}
+
+	@Override
+	public ResultBean getWebGame() {
+		WebGame webGame=webGameMapper.selectByPrimaryKey(1);
+		return ObjectResultBean.SUCCESS(webGame);
 	}
 
 
